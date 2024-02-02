@@ -26,5 +26,6 @@
     },
   ],
   "java.test.defaultConfig": "WPIlibUnitTests",
+  "editor.detectIndentation": false,
   "editor.tabSize": 2,
 }
