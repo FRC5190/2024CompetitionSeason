@@ -5,6 +5,7 @@ import org.ghrobotics.frc2024.subsystems.Drive;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class RobotState {
   // Swerve Drive
@@ -28,6 +29,8 @@ public class RobotState {
   public void update() {
     // Update pose estimator with new drive measurements
     pose_estimator_.update(drive_.getAngle(), drive_.getSwerveModulePositions());
+    SmartDashboard.putNumber("Robot Pose X", getPosition().getTranslation().getX());
+    SmartDashboard.putNumber("Robot Pose Y", getPosition().getTranslation().getY());
   }
 
   // Get Position
