@@ -1,7 +1,6 @@
 package org.ghrobotics.frc2024.subsystems;
 
-import com.ctre.phoenix6.hardware.CANcoder;
-import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import org.ghrobotics.frc2024.CANCoderSwerve;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.math.controller.PIDController;
@@ -20,7 +19,7 @@ public class SwerveModule {
   // Sensors
   private final RelativeEncoder drive_encoder_;
   private final RelativeEncoder steer_encoder_;
-  private final CANcoder cancoder_;
+  private final CANCoderSwerve cancoder_;
   
   // Control
   private final PIDController drive_pid_controller_; // in m/s
@@ -35,6 +34,7 @@ public class SwerveModule {
     drive_motor_ = new CANSparkMax(configuration_.drive_id, CANSparkMax.MotorType.kBrushless);
     drive_motor_.restoreFactoryDefaults();
     drive_motor_.setIdleMode(CANSparkMax.IdleMode.kBrake);
+    drive_motor_.setInverted(configuration_.invert);
     
     steer_motor_ = new CANSparkMax(configuration_.steer_id, CANSparkMax.MotorType.kBrushless);
     steer_motor_.restoreFactoryDefaults();
@@ -52,11 +52,9 @@ public class SwerveModule {
     steer_encoder_.setPositionConversionFactor(2 * Math.PI / Constants.kSteerGearRatio);
     steer_encoder_.setVelocityConversionFactor(2 * Math.PI / Constants.kSteerGearRatio / 60);
     
-    cancoder_ = new CANcoder(configuration.cancoder_id);
-    CANcoderConfiguration cancoderConfigs = new CANcoderConfiguration();
-    cancoderConfigs.MagnetSensor.MagnetOffset = configuration.module_offset_deg;
-    
-    cancoder_.getConfigurator().apply(cancoderConfigs);
+    cancoder_ = new CANCoderSwerve(configuration_.cancoder_id);
+    cancoder_.configure(false);
+    cancoder_.setAbsoluteEncoderOffset(configuration_.module_offset_deg);
     
     // Initialize PID controllers
     drive_pid_controller_ = new PIDController(Constants.kDriveKp, 0.0, 0.0);
@@ -91,8 +89,7 @@ public class SwerveModule {
   
   // Get CANCoder Absolute Position
   public double getCANCoderDeg() {
-    // Config should account for offset but double check
-    return cancoder_.getAbsolutePosition().getValue();
+    return cancoder_.getAbsolutePosition();
   }
   
   // Get Module State
@@ -133,13 +130,13 @@ public class SwerveModule {
     // Set drive output
     switch (output_type) {
       case OPEN_LOOP:
-      drive_motor_.set(state.speedMetersPerSecond / Constants.kMaxModuleSpeed);
-      break;
+        drive_motor_.set(state.speedMetersPerSecond / Constants.kMaxModuleSpeed);
+        break;
       case VELOCITY:
-      double drive_correction = drive_pid_controller_.calculate(
-      getDriveVelocity(), state.speedMetersPerSecond);
-      drive_motor_.set(drive_correction);
-      break;
+        double drive_correction = drive_pid_controller_.calculate(
+          getDriveVelocity(), state.speedMetersPerSecond);
+        drive_motor_.set(drive_correction);
+        break;
     }
   }
   
@@ -150,6 +147,7 @@ public class SwerveModule {
     public int cancoder_id;
     
     public double module_offset_deg;
+    public boolean invert;
   }
   
   // Constants Class

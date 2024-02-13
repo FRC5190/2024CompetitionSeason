@@ -26,8 +26,8 @@ public class Drive extends SubsystemBase {
   
   // Kinematics
   SwerveDriveKinematics kinematics_ = new SwerveDriveKinematics(
-  Constants.kFrontLeftLocation, Constants.kFrontRightLocation,
-  Constants.kBackLeftLocation, Constants.kBackRightLocation);
+    Constants.kFrontLeftLocation, Constants.kFrontRightLocation,
+    Constants.kBackLeftLocation, Constants.kBackRightLocation);
   
   // IO
   private final IO io_ = new IO();
@@ -61,9 +61,9 @@ public class Drive extends SubsystemBase {
       modules_[i].setDesiredState(module_states[i], output_type_);
       
       SmartDashboard.putNumber(String.format("Module [%d] Speed", i),
-      modules_[i].getDriveVelocity());
+        modules_[i].getDriveVelocity());
       SmartDashboard.putNumber(String.format("Module [%d] Angle", i),
-      modules_[i].getSteerPosition().getDegrees());
+        modules_[i].getSteerPosition().getDegrees());
     }
   }
   
@@ -137,23 +137,27 @@ public class Drive extends SubsystemBase {
       kFrontLeftConfig.drive_id = 1;
       kFrontLeftConfig.steer_id = 2;
       kFrontLeftConfig.cancoder_id = 11;
-      kFrontLeftConfig.module_offset_deg = 9.49;
+      kFrontLeftConfig.module_offset_deg = -24.69 + 90;
+      kFrontLeftConfig.invert = false;
       
       kFrontRightConfig.drive_id = 3;
       kFrontRightConfig.steer_id = 4;
       kFrontRightConfig.cancoder_id = 12;
-      kFrontRightConfig.module_offset_deg = 267.13;
+      kFrontRightConfig.module_offset_deg = 0;
+      kFrontRightConfig.invert = true;
       
       kBackLeftConfig.drive_id = 5;
       kBackLeftConfig.steer_id = 6;
       kBackLeftConfig.cancoder_id = 13;
-      kBackLeftConfig.module_offset_deg = 295.57;
+      kBackLeftConfig.module_offset_deg = -8 + 180;
+      kBackLeftConfig.invert = false;
       // (228.00 + -46.799534) + 180;
       
       kBackRightConfig.drive_id = 7;
       kBackRightConfig.steer_id = 8;
       kBackRightConfig.cancoder_id = 14;
-      kBackRightConfig.module_offset_deg = 279.58;
+      kBackRightConfig.module_offset_deg = -14;
+      kBackRightConfig.invert = true;
     }
     
     // Max Velocity
