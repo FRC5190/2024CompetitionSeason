@@ -28,9 +28,9 @@ public class Arm extends SubsystemBase {
     private final RelativeEncoder follower_encoder_;
 
     // Control
-    // private final ArmFeedforward ff_;
-    // private final ProfiledPIDController fb_;
-    // private boolean reset_pid_ = false;
+    private final ArmFeedforward ff_;
+    private final ProfiledPIDController fb_;
+    private boolean reset_pid_ = false;
 
     
     // Constructor
@@ -54,6 +54,22 @@ public class Arm extends SubsystemBase {
         follower_encoder_ = follower_.getEncoder();
         follower_encoder_.setPositionConversionFactor(2 * Math.PI / Constants.kGearRatio);
         follower_encoder_.setVelocityConversionFactor(2 * Math.PI / Constants.kGearRatio / 60);
+
+        // Initialize control
+        ff_ = new ArmFeedforward(Constants.kS, Constants.kG, Constants.kV, Constants.kA);
+        fb_ = new ProfiledPIDController(Constants.kP, 0, 0, new TrapezoidProfile.Constraints(
+            Constants.kMaxVelocity, Constants.kMaxAcceleration));
+
+        // Safety features
+        leader_.setSmartCurrentLimit((int) Constants.kCurrentLimit);
+        leader_.setSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, (float) Constants.kMinAngle);
+        leader_.setSoftLimit(CANSparkMax.SoftLimitDirection.kForward, (float) Constants.kMaxAngle);
+
+        // Reset encoder
+
+        System.out.println("hji");
+       
+
     }
    
    
@@ -73,6 +89,21 @@ public class Arm extends SubsystemBase {
         public static final double kMinAngle = Math.toRadians(0);
         public static final double kMaxAngle = Math.toRadians(0);
         public static final double kArmLength = 0;
+
+        // Feedforward
+        public static final double kA = 0; // volts * seconds^2 / radians
+        public static final double kG = 0; // volts
+        public static final double kS = 0; // volts
+        public static final double kV = 0; // volts * seconds/radians
+
+        // Current Limit
+        public static final double kCurrentLimit = 0;
+
+        // Control
+        public static double kMaxVelocity = 0;
+        public static double kMaxAcceleration = 0;
+        public static double kP = 0;
+        
 
     }
 }
