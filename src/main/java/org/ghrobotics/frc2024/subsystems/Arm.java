@@ -31,8 +31,16 @@ public class Arm extends SubsystemBase {
     private final ArmFeedforward ff_;
     private final ProfiledPIDController fb_;
     private boolean reset_pid_ = false;
-
     
+    // Simulation
+    private final SingleJointedArmSim physics_sim_;
+    private final SimDeviceSim leader_sim_;
+
+    // IO
+    private final PeriodicIO io_ = new PeriodicIO();
+    private OutputType output_type_ = OutputType.PERCENT;
+    
+        
     // Constructor
     public Arm() {
         // Initialize motor controllers
@@ -65,18 +73,141 @@ public class Arm extends SubsystemBase {
         leader_.setSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, (float) Constants.kMinAngle);
         leader_.setSoftLimit(CANSparkMax.SoftLimitDirection.kForward, (float) Constants.kMaxAngle);
 
+        // Initialize simulation
+        physics_sim_ = new SingleJointedArmSim(
+            LinearSystemId.identifyPositionSystem(Constants.kV, Constants.kA),
+            DCMotor.getNEO(2), Constants.kGearRatio, Constants.kArmLength, Constants.kMinAngle,
+            Constants.kMaxAngle, false, 0
+            );
+        leader_sim_ = new SimDeviceSim("SPARK MAX [" + Constants.kLeaderId + "]");
+
+        // Safety features
+        leader_.setSmartCurrentLimit((int) Constants.kCurrentLimit);
+        leader_.setSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, (float) Constants.kMinAngle);
+        leader_.setSoftLimit(CANSparkMax.SoftLimitDirection.kForward, (float) Constants.kMaxAngle);
+
         // Reset encoder
-
-        System.out.println("hji");
-       
-
+        zero();
+        physics_sim_.setState(VecBuilder.fill(Constants.kMaxAngle, 0));
     }
-   
-   
-    // IO
-    public static class PeriodicIO {
-    
+
+    @Override
+    public void periodic() {
+        // Read inputs
+        io_.angle = leader_encoder_.getPosition();
+        io_.angular_velocity = leader_encoder_.getVelocity();
+        io_.current = leader_.getOutputCurrent();
+
+        io_.angle = follower_encoder_.getPosition();
+        io_.angular_velocity = follower_encoder_.getVelocity();
+        io_.current = follower_.getOutputCurrent();
+
+        if (io_.wants_zero) {
+        io_.wants_zero = false;
+            leader_encoder_.setPosition(Constants.kMaxAngle);
+            follower_encoder_.setPosition(Constants.kMaxAngle);
+        }
+
+        // Reset controller if we have to
+        if (reset_pid_) {
+            reset_pid_ = false;
+            fb_.reset(io_.angle, io_.angular_velocity);
+        }
+
+        // Write outputs
+        switch (output_type_) {
+        case PERCENT:
+            leader_.set(io_.demand);
+
+            // Set simulated inputs
+            if (RobotBase.isSimulation())
+            leader_sim_.getDouble("Applied Output").set(io_.demand * 12);
+
+            break;
+        case ANGLE:
+            double feedback = fb_.calculate(io_.angle);
+
+            double velocity_setpoint = fb_.getSetpoint().velocity;
+            double acceleration_setpoint = (velocity_setpoint - io_.angular_velocity) / 0.02;
+            double feedforward = ff_.calculate(io_.angle, velocity_setpoint, acceleration_setpoint);
+
+            leader_.setVoltage(feedback + feedforward);
+            follower_.setVoltage(feedback + feedforward);
+            break;
+        }
     }
+
+    @Override
+    public void simulationPeriodic() {
+        // Update physics sim with inputs
+        double voltage = leader_.getAppliedOutput();
+        if (output_type_ == OutputType.ANGLE)
+        voltage -= Constants.kG * Math.cos(io_.angle);
+        physics_sim_.setInputVoltage(voltage);
+
+        // Update physics sim forward in time
+        physics_sim_.update(0.02);
+
+        // Update encoder values
+        leader_sim_.getDouble("Position").set(physics_sim_.getAngleRads());
+        leader_sim_.getDouble("Velocity").set(physics_sim_.getVelocityRadPerSec());
+    }
+
+    public void setPercent(double percent) {
+        output_type_ = OutputType.PERCENT;
+        io_.demand = percent;
+        reset_pid_ = true;
+    }
+
+    public void setAngle(double angle) {
+        output_type_ = OutputType.ANGLE;
+        fb_.setGoal(angle);
+        reset_pid_ = true;
+    }
+
+    public void enableSoftLimits(boolean value) {
+        leader_.enableSoftLimit(CANSparkMax.SoftLimitDirection.kForward, value);
+        leader_.enableSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, value);
+    }
+
+    public void zero() {
+        io_.wants_zero = true;
+    }
+
+    // Position Getter
+    public double getAngle() {
+        return io_.angle;
+    }
+
+    public double getAngularVelocity() {
+        return io_.angular_velocity;
+    }
+
+    public double getAngularVelocitySetpoint() {
+        return fb_.getSetpoint().velocity;
+    }
+
+    public double getCurrent() {
+        return io_.current;
+    }
+
+    // Output Type
+    private enum OutputType {
+        PERCENT, ANGLE
+    }
+
+    //IO
+    private static class PeriodicIO {
+        //Inputs
+        double angle;
+        double angular_velocity;
+        double current;
+
+        //Outputs
+        boolean wants_zero;
+        double demand;
+    }
+        
 
     // Constants (TO UPDATE)
     public static class Constants {
