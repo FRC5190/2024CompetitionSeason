@@ -3,7 +3,6 @@ package org.ghrobotics.frc2024.subsystems;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
-import edu.wpi.first.math.StateSpaceUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -85,6 +84,10 @@ public class Arm extends SubsystemBase {
         leader_.setSmartCurrentLimit((int) Constants.kCurrentLimit);
         leader_.setSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, (float) Constants.kMinAngle);
         leader_.setSoftLimit(CANSparkMax.SoftLimitDirection.kForward, (float) Constants.kMaxAngle);
+        
+        follower_.setSmartCurrentLimit((int) Constants.kCurrentLimit);
+        follower_.setSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, (float) Constants.kMinAngle);
+        follower_.setSoftLimit(CANSparkMax.SoftLimitDirection.kForward, (float) Constants.kMaxAngle);
 
         // Reset encoder
         zero();
@@ -118,6 +121,7 @@ public class Arm extends SubsystemBase {
         switch (output_type_) {
         case PERCENT:
             leader_.set(io_.demand);
+            follower_.set(io_.demand);
 
             // Set simulated inputs
             if (RobotBase.isSimulation())
@@ -168,7 +172,8 @@ public class Arm extends SubsystemBase {
     public void enableSoftLimits(boolean value) {
         leader_.enableSoftLimit(CANSparkMax.SoftLimitDirection.kForward, value);
         leader_.enableSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, value);
-    }
+        follower_.enableSoftLimit(CANSparkMax.SoftLimitDirection.kForward, value);
+        follower_.enableSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, value);    }
 
     public void zero() {
         io_.wants_zero = true;
@@ -234,8 +239,6 @@ public class Arm extends SubsystemBase {
         public static double kMaxVelocity = 0;
         public static double kMaxAcceleration = 0;
         public static double kP = 0;
-        
-
     }
 }
 
