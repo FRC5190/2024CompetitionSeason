@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Intake extends SubsystemBase {
     // Motor Controllers
     private final CANSparkMax leader_; // Left
-    
+    private final PeriodicIO io_ = new PeriodicIO();
     // Constructor
     public Intake() {
         // Initialize motor controllers
@@ -17,10 +17,27 @@ public class Intake extends SubsystemBase {
         leader_.setInverted(true);
         leader_.setIdleMode(CANSparkMax.IdleMode.kCoast);
     }
-
+    
+    public void periodic() {
+        // Read inputs.
+        io_.leader_supply_current = leader_.getOutputCurrent();
+        leader_.set(io_.leader_bridge_demand);
+    }
+ 
+    //get, set % output on intake. parameter is percent output [-1, 1]
+    public void setIntakePercent(double value) {
+        io_.leader_bridge_demand = value;
+    }
+    //Returns the % output of the intake and bridge.
+    public double getIntakePercent() {
+        return io_.leader_bridge_demand;
+    }
     // IO
     public static class PeriodicIO {
-    
+        //input
+        double leader_supply_current;
+        //output
+        double leader_bridge_demand;
     }
 
     // Constants
