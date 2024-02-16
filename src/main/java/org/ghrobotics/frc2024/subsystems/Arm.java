@@ -173,7 +173,8 @@ public class Arm extends SubsystemBase {
         leader_.enableSoftLimit(CANSparkMax.SoftLimitDirection.kForward, value);
         leader_.enableSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, value);
         follower_.enableSoftLimit(CANSparkMax.SoftLimitDirection.kForward, value);
-        follower_.enableSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, value);    }
+        follower_.enableSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, value);    
+    }
 
     public void zero() {
         io_.wants_zero = true;
