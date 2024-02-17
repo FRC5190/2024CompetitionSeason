@@ -32,6 +32,6 @@ public class ArmToPosition extends Command {
 
   // Constants
   private static final class Constants {
-    public static final double kTolerance = 0; // NEED TO UPDATE
+    public static final double kTolerance = 0.5; // NEED TO UPDATE
   }
 }

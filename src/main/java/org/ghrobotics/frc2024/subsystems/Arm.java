@@ -53,6 +53,8 @@ public class Arm extends SubsystemBase {
         follower_.setInverted(false);
         follower_.setIdleMode(CANSparkMax.IdleMode.kCoast);
 
+        follower_.follow(leader_);
+
         // Initialize encoders
         leader_encoder_ = leader_.getEncoder();
         leader_encoder_.setPositionConversionFactor(2 * Math.PI / Constants.kGearRatio);
@@ -106,7 +108,7 @@ public class Arm extends SubsystemBase {
         io_.current = follower_.getOutputCurrent();
 
         if (io_.wants_zero) {
-        io_.wants_zero = false;
+            io_.wants_zero = false;
             leader_encoder_.setPosition(Constants.kMaxAngle);
             follower_encoder_.setPosition(Constants.kMaxAngle);
         }
