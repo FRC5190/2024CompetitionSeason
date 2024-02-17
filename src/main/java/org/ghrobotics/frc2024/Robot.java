@@ -5,26 +5,14 @@
 package org.ghrobotics.frc2024;
 
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
-// import org.ghrobotics.frc2024.auto.AutoSelector;
-// import org.ghrobotics.frc2024.commands.DriveBrakeMode;
-// import org.ghrobotics.frc2024.commands.DriveTeleop;
-// import org.ghrobotics.frc2024.commands.DriveTowardPosition;
-// import org.ghrobotics.frc2024.commands.HomeSuperstructure;
-// import org.ghrobotics.frc2024.subsystems.Drivetrain;
+
 import org.ghrobotics.frc2024.subsystems.Arm;
 import org.ghrobotics.frc2024.subsystems.Climber;
 import org.ghrobotics.frc2024.subsystems.Intake;
 import org.ghrobotics.frc2024.subsystems.Shooter;
-// import org.ghrobotics.frc2024.subsystems.LED;
-// import org.ghrobotics.frc2024.subsystems.LED.StandardLEDOutput;
-// import org.ghrobotics.frc2024.subsystems.Limelight;
-// import org.ghrobotics.frc2024.subsystems.PoseEstimator;
+
 
 
 /**
@@ -57,7 +45,9 @@ public class Robot extends TimedRobot {
   public void robotInit() {}
 
   @Override
-  public void robotPeriodic() {}
+  public void robotPeriodic() {
+    SmartDashboard.putString("Current State", superstructure_.getState());
+  }
 
   @Override
   public void autonomousInit() {}

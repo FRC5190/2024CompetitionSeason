@@ -119,7 +119,7 @@ public class Climber extends SubsystemBase {
         switch (right_output_type_) {
         case PERCENT:
             // Send the percent output values directly to the motor controller.
-            left_leader_.set(io_.r_demand);
+            right_leader_.set(io_.r_demand);
 
         case POSITION:
             // Calculate feedforward value and add to built-in motor controller PID.
