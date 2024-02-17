@@ -25,13 +25,14 @@ public class Intake extends SubsystemBase {
     }
  
     //get, set % output on intake. parameter is percent output [-1, 1]
-    public void setIntakePercent(double value) {
+    public double getPercent() {
+        return io_.leader_bridge_demand;
+    }
+    public void setPercent(double value) {
         io_.leader_bridge_demand = value;
     }
     //Returns the % output of the intake and bridge.
-    public double getIntakePercent() {
-        return io_.leader_bridge_demand;
-    }
+ 
     // IO
     public static class PeriodicIO {
         //input
