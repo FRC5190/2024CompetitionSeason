@@ -97,6 +97,12 @@ public class Drive extends SubsystemBase {
   public void setSpeeds(ChassisSpeeds speeds) {
     setSpeeds(speeds, OutputType.VELOCITY);
   }
+
+  // Set Brake mode for all modules
+  public void setBrakeMode(boolean value) {
+    for (SwerveModule module : modules_) 
+      module.setBrakeMode(value); 
+  }
   
   // Puts wheels in X shape for brake
   public void HoldPosition() {

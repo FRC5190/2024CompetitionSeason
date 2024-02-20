@@ -48,6 +48,7 @@ public class Robot extends TimedRobot {
   // robot_state_.update();
   @Override
   public void teleopInit() {
+    drive_.setBrakeMode(true);
   }
   
   @Override

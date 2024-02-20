@@ -3,6 +3,7 @@ package org.ghrobotics.frc2024.subsystems;
 import org.ghrobotics.frc2024.CANCoderSwerve;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.CANSparkBase.IdleMode;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -95,6 +96,13 @@ public class SwerveModule {
   // Get Module State
   public SwerveModuleState getState() {
     return new SwerveModuleState(getDriveVelocity(), getSteerPosition());
+  }
+
+  public void setBrakeMode(boolean value) {
+    IdleMode mode = value ? IdleMode.kBrake : IdleMode.kCoast;
+
+    drive_motor_.setIdleMode(mode);
+    steer_motor_.setIdleMode(mode);
   }
   
   // Reset Encoders
