@@ -24,11 +24,11 @@ public class Robot extends TimedRobot {
   private final RobotState robot_state_ = new RobotState(drive_);
   
   // Xbox Controller
-  private final CommandXboxController controller_ = new CommandXboxController(0);
+  private final CommandXboxController driver_controller_ = new CommandXboxController(0);
   
   @Override
   public void robotInit() {
-    drive_.setDefaultCommand(new DriveTeleop(drive_, robot_state_, controller_));
+    drive_.setDefaultCommand(new DriveTeleop(drive_, robot_state_, driver_controller_));
   }
   
   @Override

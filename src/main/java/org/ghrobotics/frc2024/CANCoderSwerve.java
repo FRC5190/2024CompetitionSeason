@@ -54,9 +54,9 @@ public class CANCoderSwerve {
     MagnetSensorConfigs  magnetSensorConfiguration = new MagnetSensorConfigs();
     cfg.refresh(magnetSensorConfiguration);
     cfg.apply(magnetSensorConfiguration
-                  .withAbsoluteSensorRange(AbsoluteSensorRangeValue.Signed_PlusMinusHalf)
-                  .withSensorDirection(inverted ? SensorDirectionValue.Clockwise_Positive
-                                                : SensorDirectionValue.CounterClockwise_Positive));
+      .withAbsoluteSensorRange(AbsoluteSensorRangeValue.Signed_PlusMinusHalf)
+        .withSensorDirection(inverted ? SensorDirectionValue.Clockwise_Positive
+          : SensorDirectionValue.CounterClockwise_Positive));
   }
 
   /**

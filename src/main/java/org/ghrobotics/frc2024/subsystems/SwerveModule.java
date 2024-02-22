@@ -75,7 +75,7 @@ public class SwerveModule {
   // Get Steer Position
   public Rotation2d getSteerPosition() {
     return new Rotation2d(
-    Math.IEEEremainder(steer_encoder_.getPosition(), 2 * Math.PI));
+      Math.IEEEremainder(steer_encoder_.getPosition(), 2 * Math.PI));
   }
   
   // Get Module Position
@@ -121,7 +121,7 @@ public class SwerveModule {
     
     // Set steer angle
     double steering_correction = steer_pid_controller_.calculate(
-    getSteerPosition().getRadians(), desired_angle_rad);
+      getSteerPosition().getRadians(), desired_angle_rad);
     steer_motor_.set(steering_correction);
   }
   
