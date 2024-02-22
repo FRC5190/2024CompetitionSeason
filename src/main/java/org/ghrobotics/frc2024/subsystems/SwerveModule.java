@@ -34,12 +34,12 @@ public class SwerveModule {
     // Initialize motor controllers
     drive_motor_ = new CANSparkMax(configuration_.drive_id, CANSparkMax.MotorType.kBrushless);
     drive_motor_.restoreFactoryDefaults();
-    drive_motor_.setIdleMode(CANSparkMax.IdleMode.kBrake);
+    drive_motor_.setIdleMode(CANSparkMax.IdleMode.kCoast);
     drive_motor_.setInverted(configuration_.invert);
     
     steer_motor_ = new CANSparkMax(configuration_.steer_id, CANSparkMax.MotorType.kBrushless);
     steer_motor_.restoreFactoryDefaults();
-    steer_motor_.setIdleMode(CANSparkMax.IdleMode.kBrake);
+    steer_motor_.setIdleMode(CANSparkMax.IdleMode.kCoast);
     steer_motor_.setInverted(true);
     
     // Initialize encoders

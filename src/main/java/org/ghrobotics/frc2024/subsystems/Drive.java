@@ -143,26 +143,26 @@ public class Drive extends SubsystemBase {
       kFrontLeftConfig.drive_id = 1;
       kFrontLeftConfig.steer_id = 2;
       kFrontLeftConfig.cancoder_id = 11;
-      kFrontLeftConfig.module_offset_deg = -24.69 + 90;
+      kFrontLeftConfig.module_offset_deg = -8.0;
       kFrontLeftConfig.invert = false;
       
       kFrontRightConfig.drive_id = 3;
       kFrontRightConfig.steer_id = 4;
       kFrontRightConfig.cancoder_id = 12;
-      kFrontRightConfig.module_offset_deg = 0;
+      kFrontRightConfig.module_offset_deg = 173.44;
       kFrontRightConfig.invert = true;
       
       kBackLeftConfig.drive_id = 5;
       kBackLeftConfig.steer_id = 6;
       kBackLeftConfig.cancoder_id = 13;
-      kBackLeftConfig.module_offset_deg = -8 + 180;
+      kBackLeftConfig.module_offset_deg = 9.14;
       kBackLeftConfig.invert = false;
       // (228.00 + -46.799534) + 180;
       
       kBackRightConfig.drive_id = 7;
       kBackRightConfig.steer_id = 8;
       kBackRightConfig.cancoder_id = 14;
-      kBackRightConfig.module_offset_deg = -14;
+      kBackRightConfig.module_offset_deg = 60.90;
       kBackRightConfig.invert = true;
     }
     
