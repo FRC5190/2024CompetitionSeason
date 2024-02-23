@@ -15,6 +15,9 @@ This document details all of the hardware (motors, motor controllers, sensors, e
 | 6   | Drivetrain BL Steer | NEO        | SPARK MAX        | ?        |
 | 7   | Drivetrain BR Drive | NEO        | SPARK MAX        | ?        |
 | 8   | Drivetrain BR Steer | NEO        | SPARK MAX        | ?        |
+| 9   | Arm L               | NEO        | SPARK MAX        | ?        |
+| 10  | Arm R               | NEO        | SPARK MAX        | ?        |
+| 11  | Intake              | NEO        | SPARK MAX        | ?        |
 
 
 

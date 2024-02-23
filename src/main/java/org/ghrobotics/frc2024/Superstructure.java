@@ -12,8 +12,6 @@ import org.ghrobotics.frc2024.subsystems.Climber;
 import org.ghrobotics.frc2024.subsystems.Intake;
 import org.ghrobotics.frc2024.subsystems.Shooter;
 
-
-
 public class Superstructure {
   // Subsystems
   private final Arm arm_;
@@ -42,6 +40,25 @@ public class Superstructure {
     );
   }
 
+  // Intake Setter
+  // Might change to functional later
+  public Command setIntake(double percent) {
+    return new StartEndCommand(
+      () -> intake_.setPercent(percent),
+      () -> intake_.setPercent(0),
+      intake_
+    );
+  }
+
+  // Jog Arm
+  public Command jogArm(double percent) {
+    return new StartEndCommand(
+      () -> arm_.setPercent(percent),
+      () -> arm_.setAngle(arm_.getAngle()),
+      arm_
+    );
+  }
+
   // Jog Left Climber
   public Command jogLeftClimber(double percent) {
     return new StartEndCommand(
@@ -62,7 +79,6 @@ public class Superstructure {
 
   // GetPosition of Superstructure
   public String getState() {
-    //System.out.println(state);
     return state;
   }
 
