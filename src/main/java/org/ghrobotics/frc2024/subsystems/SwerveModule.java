@@ -34,12 +34,12 @@ public class SwerveModule {
     // Initialize motor controllers
     drive_motor_ = new CANSparkMax(configuration_.drive_id, CANSparkMax.MotorType.kBrushless);
     drive_motor_.restoreFactoryDefaults();
-    drive_motor_.setIdleMode(CANSparkMax.IdleMode.kBrake);
+    drive_motor_.setIdleMode(CANSparkMax.IdleMode.kCoast);
     drive_motor_.setInverted(configuration_.invert);
     
     steer_motor_ = new CANSparkMax(configuration_.steer_id, CANSparkMax.MotorType.kBrushless);
     steer_motor_.restoreFactoryDefaults();
-    steer_motor_.setIdleMode(CANSparkMax.IdleMode.kBrake);
+    steer_motor_.setIdleMode(CANSparkMax.IdleMode.kCoast);
     steer_motor_.setInverted(true);
     
     // Initialize encoders
@@ -75,7 +75,7 @@ public class SwerveModule {
   // Get Steer Position
   public Rotation2d getSteerPosition() {
     return new Rotation2d(
-    Math.IEEEremainder(steer_encoder_.getPosition(), 2 * Math.PI));
+      Math.IEEEremainder(steer_encoder_.getPosition(), 2 * Math.PI));
   }
   
   // Get Module Position
@@ -121,7 +121,7 @@ public class SwerveModule {
     
     // Set steer angle
     double steering_correction = steer_pid_controller_.calculate(
-    getSteerPosition().getRadians(), desired_angle_rad);
+      getSteerPosition().getRadians(), desired_angle_rad);
     steer_motor_.set(steering_correction);
   }
   

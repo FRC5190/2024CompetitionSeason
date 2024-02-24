@@ -26,14 +26,10 @@ public class Robot extends TimedRobot {
   
   // Xbox Controller
   private final CommandXboxController driver_controller_ = new CommandXboxController(0);
-
-  // private final AutoSelector auto_selector_ = new AutoSelector(drive_, robot_state_);
   
   @Override
   public void robotInit() {
     drive_.setDefaultCommand(new DriveTeleop(drive_, robot_state_, driver_controller_));
-
-    drive_.setBrakeMode(true);
   }
   
   @Override
