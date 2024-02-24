@@ -50,6 +50,15 @@ public class Superstructure {
     );
   }
 
+  // Shooter Setter
+  public Command setShooter(double percent) {
+    return new StartEndCommand(
+      () -> shooter_.setPercent(percent),
+      () -> shooter_.setPercent(0),
+      shooter_
+    );
+  }
+
   // Jog Arm
   public Command jogArm(double percent) {
     return new StartEndCommand(
