@@ -1,5 +1,6 @@
 package org.ghrobotics.frc2024;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -28,6 +29,11 @@ public class Superstructure {
     climber_ = climber;
     intake_ = intake;
     shooter_ = shooter;
+  }
+
+  public void periodic() {
+    SmartDashboard.putNumber("Shooter Percent", shooter_.getPercent());
+    SmartDashboard.putNumber("Intake Percent", intake_.getPercent());
   }
 
   // Position Setter
