@@ -7,6 +7,7 @@ package org.ghrobotics.frc2024;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+
 import org.ghrobotics.frc2024.commands.DriveTeleop;
 import org.ghrobotics.frc2024.subsystems.Drive;
 
@@ -24,11 +25,15 @@ public class Robot extends TimedRobot {
   private final RobotState robot_state_ = new RobotState(drive_);
   
   // Xbox Controller
-  private final CommandXboxController controller_ = new CommandXboxController(0);
+  private final CommandXboxController driver_controller_ = new CommandXboxController(0);
+
+  // private final AutoSelector auto_selector_ = new AutoSelector(drive_, robot_state_);
   
   @Override
   public void robotInit() {
-    drive_.setDefaultCommand(new DriveTeleop(drive_, robot_state_, controller_));
+    drive_.setDefaultCommand(new DriveTeleop(drive_, robot_state_, driver_controller_));
+
+    drive_.setBrakeMode(true);
   }
   
   @Override
@@ -38,7 +43,13 @@ public class Robot extends TimedRobot {
   }
   
   @Override
-  public void autonomousInit() {}
+  public void autonomousInit() {
+    // robot_state_.reset(auto_selector_.getStartPosition());
+    // SmartDashboard.putNumber("before", 1);
+    // auto_selector_.getAutonomousCommand().schedule();
+    // SmartDashboard.putNumber("after", 2);
+    
+  }
   
   @Override
   public void autonomousPeriodic() {}

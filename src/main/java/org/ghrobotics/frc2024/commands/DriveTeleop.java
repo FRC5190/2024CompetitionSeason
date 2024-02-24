@@ -6,6 +6,10 @@ package org.ghrobotics.frc2024.commands;
 
 import org.ghrobotics.frc2024.subsystems.Drive;
 import org.ghrobotics.frc2024.RobotState;
+
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -51,6 +55,9 @@ public class DriveTeleop extends Command {
     else{
       drive_.setSpeeds(speeds, Drive.OutputType.OPEN_LOOP);
     }
+
+    if (controller_.leftBumper().getAsBoolean())
+      robot_state_.reset(new Pose2d(new Translation2d(0, 0), Rotation2d.fromDegrees(0)));
   }
 
   // Constants
