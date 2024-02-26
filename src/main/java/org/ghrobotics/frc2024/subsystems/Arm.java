@@ -3,8 +3,11 @@ package org.ghrobotics.frc2024.subsystems;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
+
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.ArmFeedforward;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
@@ -37,6 +40,8 @@ public class Arm extends SubsystemBase {
   // IO
   private final PeriodicIO io_ = new PeriodicIO();
   private OutputType output_type_ = OutputType.PERCENT;
+
+  private final PIDController pid_ = new PIDController(0.5, 0, 0);
       
   // Constructor
   public Arm() {
@@ -170,6 +175,16 @@ public class Arm extends SubsystemBase {
     output_type_ = OutputType.ANGLE;
     fb_.setGoal(angle);
     reset_pid_ = true;
+  }
+
+  /**
+   * Set Arm Angle using PID
+   * @param angle in Degrees
+   */
+  public void setAnglePID(double angle) {
+    pid_.setSetpoint(angle);
+    double output = MathUtil.clamp(pid_.calculate(Math.toDegrees(getAngle())), -0.8, 0.8);
+    setPercent(output);
   }
 
   public void setBrakeMode(boolean value) {
