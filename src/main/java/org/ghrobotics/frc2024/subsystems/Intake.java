@@ -18,15 +18,15 @@ public class Intake extends SubsystemBase {
   // Constructor
   public Intake() {
     // Initialize motor controllers
-    leader_left_ = new CANSparkMax(Constants.kLeaderId, MotorType.kBrushless);
+    leader_left_ = new CANSparkMax(Constants.kLeaderLeftId, MotorType.kBrushless);
     leader_left_.restoreFactoryDefaults();
     leader_left_.setInverted(true);
     leader_left_.setIdleMode(CANSparkMax.IdleMode.kCoast);
 
 
-    leader_right_ = new CANSparkMax(Constants.kLeaderId, MotorType.kBrushless);
+    leader_right_ = new CANSparkMax(Constants.kLeaderRightId, MotorType.kBrushless);
     leader_right_.restoreFactoryDefaults();
-    leader_right_.setInverted(false);
+    leader_right_.setInverted(true);
     leader_right_.setIdleMode(CANSparkMax.IdleMode.kCoast);
     leader_right_.follow(leader_left_);
 
@@ -37,16 +37,27 @@ public class Intake extends SubsystemBase {
     // Read inputs.
     io_.current_left_ = leader_left_.getOutputCurrent();
     io_.current_right_ = leader_right_.getOutputCurrent();
-    leader_left_.set(io_.demand);
+    leader_left_.set(io_.left_demand);
+    leader_right_.set(io_.right_demand);
   }
 
-  public double getPercent() {
-    return io_.demand;
-  }
+  // public double getPercent() {
+  //   return io_.demand;
+  // }
+
+  // public void setPercent(double value) {
+  //   double correction = MathUtil.clamp(controller_.calculate(getPercent(), value), -1.0, 1.0);
+  //   io_.left_demand = correction;
+  //   io_.right_demand = correction;
+  // }
 
   public void setPercent(double value) {
-    double correction = MathUtil.clamp(controller_.calculate(getPercent(), value), -1.0, 1.0);
-    io_.demand = correction;
+    io_.left_demand = value;
+    io_.right_demand = value - 0.1;
+  }
+  public void stopMotor() {
+    io_.left_demand = 0;
+    io_.right_demand = 0;
   }
 
   // IO
@@ -56,13 +67,15 @@ public class Intake extends SubsystemBase {
     double current_right_;
 
     // Output
-    double demand;
+    double left_demand;
+    double right_demand;
   }
 
   // Constants
   public static class Constants {
     // Motor Controllers
-    public static final int kLeaderId = 0;
+    public static final int kLeaderLeftId = 11;
+    public static final int kLeaderRightId = 12;
 
     // PID Constants
     public static final double kP = 0.8;

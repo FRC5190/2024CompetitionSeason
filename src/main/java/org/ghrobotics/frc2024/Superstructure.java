@@ -2,6 +2,8 @@ package org.ghrobotics.frc2024;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -9,14 +11,14 @@ import edu.wpi.first.wpilibj2.command.StartEndCommand;
 
 import org.ghrobotics.frc2024.commands.ArmToPosition;
 import org.ghrobotics.frc2024.subsystems.Arm;
-import org.ghrobotics.frc2024.subsystems.Climber;
+// import org.ghrobotics.frc2024.subsystems.Climber;
 import org.ghrobotics.frc2024.subsystems.Intake;
 import org.ghrobotics.frc2024.subsystems.Shooter;
 
 public class Superstructure {
   // Subsystems
   private final Arm arm_;
-  private final Climber climber_;
+  // private final Climber climber_;
   private final Intake intake_;
   private final Shooter shooter_;
 
@@ -24,16 +26,17 @@ public class Superstructure {
   public String state = "STOW";
 
   // Constructor
-  public Superstructure(Arm arm, Climber climber, Intake intake, Shooter shooter) {
+  public Superstructure(Arm arm, Intake intake, Shooter shooter) {
     arm_ = arm;
-    climber_ = climber;
+    // climber_ = climber;
     intake_ = intake;
     shooter_ = shooter;
   }
 
   public void periodic() {
     SmartDashboard.putNumber("Shooter Percent", shooter_.getPercent());
-    SmartDashboard.putNumber("Intake Percent", intake_.getPercent());
+    // SmartDashboard.putNumber("Intake Percent", intake_.getPercent());
+    SmartDashboard.putNumber("Arm Angle", Math.toDegrees(arm_.getAngle()));
   }
 
   // Position Setter
@@ -51,7 +54,7 @@ public class Superstructure {
   public Command setIntake(double percent) {
     return new StartEndCommand(
       () -> intake_.setPercent(percent),
-      () -> intake_.setPercent(0),
+      () -> intake_.stopMotor(),
       intake_
     );
   }
@@ -60,7 +63,7 @@ public class Superstructure {
   public Command setShooter(double percent) {
     return new StartEndCommand(
       () -> shooter_.setPercent(percent),
-      () -> shooter_.setPercent(0),
+      () -> shooter_.stopMotor(),
       shooter_
     );
   }
@@ -74,23 +77,27 @@ public class Superstructure {
     );
   }
 
-  // Jog Left Climber
-  public Command jogLeftClimber(double percent) {
-    return new StartEndCommand(
-      () -> climber_.setLeftPercent(percent),
-      () -> climber_.setLeftPercent(0.1/12),
-      climber_
-    );
+  public Command shoot() {
+    return Commands.parallel(setIntake(-0.6), setShooter(-0.75));
   }
 
-  // Jog Right Climber
-  public Command jogRightClimber(double percent) {
-    return new StartEndCommand(
-      () -> climber_.setRightPercent(percent),
-      () -> climber_.setRightPercent(0.1/12),
-      climber_
-    );
-  }
+  // // Jog Left Climber
+  // public Command jogLeftClimber(double percent) {
+  //   return new StartEndCommand(
+  //     () -> climber_.setLeftPercent(percent),
+  //     () -> climber_.setLeftPercent(0.1/12),
+  //     climber_
+  //   );
+  // }
+
+  // // Jog Right Climber
+  // public Command jogRightClimber(double percent) {
+  //   return new StartEndCommand(
+  //     () -> climber_.setRightPercent(percent),
+  //     () -> climber_.setRightPercent(0.1/12),
+  //     climber_
+  //   );
+  // }
 
   // GetPosition of Superstructure
   public String getState() {
