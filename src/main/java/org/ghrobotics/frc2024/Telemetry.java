@@ -7,6 +7,7 @@ import org.ghrobotics.frc2024.subsystems.Arm;
 
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.util.Color;
@@ -17,11 +18,20 @@ public class Telemetry {
   // Periodic
   private final List<Runnable> periodic_registry_ = new ArrayList<>();
 
+  private final Field2d field_;
+
   private final Mechanism2d superstructure_;
 
 
   public Telemetry(RobotState robot_state, Arm arm) {
-    ShuffleboardTab tab_ = Shuffleboard.getTab("Robot 2024");
+    ShuffleboardTab tab_ = Shuffleboard.getTab("2024");
+
+    field_ = new Field2d();
+        tab_.add("Field", field_);
+        if (Robot.isReal())
+            periodic_registry_.add(() -> field_.setRobotPose(robot_state.getPosition()));
+        if(!Robot.isReal())
+            field_.setRobotPose(null);
 
     superstructure_ = new Mechanism2d(1.2, 1.2);
 
@@ -39,5 +49,5 @@ public class Telemetry {
     for (Runnable fn : periodic_registry_)
       fn.run();
     // System.out.println(periodic_registry_);
-}
+  }
 }
