@@ -1,6 +1,8 @@
 package org.ghrobotics.frc2024.auto;
 
 import org.ghrobotics.frc2024.RobotState;
+import org.ghrobotics.frc2024.Superstructure;
+import org.ghrobotics.frc2024.Superstructure.Position;
 import org.ghrobotics.frc2024.subsystems.Drive;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -14,26 +16,19 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
 public class AutoSelector {
   private final SendableChooser<Command> auto_chooser_;
   
   private final Drive drive_;
   private final RobotState robot_state_;
-  
-  PathPlannerPath pickup_path = PathPlannerPath.fromPathFile("Pickup");
-  PathPlannerPath shoot_path = PathPlannerPath.fromPathFile("Shoot");
-  PathPlannerPath pickup_again_path = PathPlannerPath.fromPathFile("Pickup Again");
-  PathPlannerPath shoot_again_path = PathPlannerPath.fromPathFile("Shoot Again");
+  private final Superstructure superstructure_;
 
-  public AutoSelector(Drive drive, RobotState robot_state) {
+  public AutoSelector(Drive drive, RobotState robot_state, Superstructure superstructure) {
     
     drive_ = drive;
     robot_state_ = robot_state;
-
-    
+    superstructure_ = superstructure;
 
     AutoBuilder.configureHolonomic(
       robot_state_::getPosition,
@@ -58,27 +53,21 @@ public class AutoSelector {
     );
 
     auto_chooser_ = AutoBuilder.buildAutoChooser();
-
+    auto_chooser_.setDefaultOption("Two Note Top", new TwoNoteTop(drive_, superstructure_));
+    auto_chooser_.addOption("Two Note Middle", new TwoNoteMiddle(drive_, superstructure_));
+    auto_chooser_.addOption("Two Note Bottom", new TwoNoteBottom(drive_, superstructure_));
 
     SmartDashboard.putData("Auto Chooser", auto_chooser_);
   }
 
   public Command getAutonomousCommand() {
-    Command shootPath = AutoBuilder.followPath(shoot_path);
-    Command pickupPath = AutoBuilder.followPath(pickup_path);
-    Command pickupAgainPath = AutoBuilder.followPath(pickup_again_path);
-    Command shoootagainPath = AutoBuilder.followPath(shoot_again_path);
-    
-    return new SequentialCommandGroup(
-      pickupPath,
-      shootPath,
-      pickupAgainPath,
-      shoootagainPath
-    );
+    return auto_chooser_.getSelected();
   }
 
+  // this is here just so it stopped giving me errors we need to fix this
+  PathPlannerPath pickup_top = PathPlannerPath.fromPathFile("Pickup Top");
   public Pose2d getStartPosition(){
-    return pickup_path.getStartingDifferentialPose();
+    return pickup_top.getStartingDifferentialPose();
   }
 
   public static class Constants {
