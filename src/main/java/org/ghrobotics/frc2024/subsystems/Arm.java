@@ -41,22 +41,22 @@ public class Arm extends SubsystemBase {
   private final PeriodicIO io_ = new PeriodicIO();
   private OutputType output_type_ = OutputType.PERCENT;
 
-  private final PIDController pid_ = new PIDController(0.5, 0, 0);
+  private final PIDController pid_ = new PIDController(0.25, 0, 0);
       
   // Constructor
   public Arm() {
     // Initialize motor controllers
     leader_ = new CANSparkMax(Constants.kLeaderId, MotorType.kBrushless);
     leader_.restoreFactoryDefaults();
-    leader_.setInverted(true);
+    leader_.setInverted(false);
     leader_.setIdleMode(CANSparkMax.IdleMode.kCoast);
     
     follower_ = new CANSparkMax(Constants.kFollowerId, MotorType.kBrushless);
     follower_.restoreFactoryDefaults();
-    follower_.setInverted(true);
+    follower_.setInverted(false);
     follower_.setIdleMode(CANSparkMax.IdleMode.kCoast);
 
-    follower_.follow(leader_);
+    // follower_.follow(leader_);
 
     // Initialize encoders
     leader_encoder_ = leader_.getEncoder();
@@ -125,7 +125,7 @@ public class Arm extends SubsystemBase {
     switch (output_type_) {
       case PERCENT:
         leader_.set(io_.demand);
-        follower_.set(io_.demand);
+        follower_.set(-io_.demand);
 
         // Set simulated inputs
         if (RobotBase.isSimulation())
@@ -142,6 +142,11 @@ public class Arm extends SubsystemBase {
         leader_.setVoltage(feedback + feedforward);
         // follower_.setVoltage(feedback + feedforward);
         break;
+    }
+
+    // Software Stop
+    if (io_.angle > 90 && io_.demand > 0) {
+      io_.demand = -0.1;
     }
   }
 
@@ -183,7 +188,13 @@ public class Arm extends SubsystemBase {
    */
   public void setAnglePID(double angle) {
     pid_.setSetpoint(angle);
-    double output = MathUtil.clamp(pid_.calculate(Math.toDegrees(getAngle())), -0.8, 0.8);
+    SmartDashboard.putNumber("Angle Calculate", pid_.calculate(Math.toDegrees(getAngle())));
+    double output = MathUtil.clamp(pid_.calculate(Math.toDegrees(getAngle())), -0.2, 0.35);
+    SmartDashboard.putNumber("Arm output", output);
+
+    if (Math.abs(output) < 0.01){
+      output = 0;
+    }
     setPercent(output);
   }
 

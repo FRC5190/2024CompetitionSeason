@@ -21,7 +21,7 @@ This document details all of the hardware (motors, motor controllers, sensors, e
 | 12  | Intake R            | NEO        | SPARK MAX        | ?        |
 | 13  | Shooter L           | NEO        | SPARK MAX        | ?        |
 | 14  | Shooter R           | NEO        | SPARK MAX        | ?        |
-
+| 15  | Feeder              | NEO 550    | SPARK MAX        | ?        |
 
 
 
