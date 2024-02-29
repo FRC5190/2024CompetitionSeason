@@ -2,7 +2,6 @@ package org.ghrobotics.frc2024.subsystems;
 
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.math.controller.PIDController;
@@ -24,7 +23,7 @@ public class Shooter extends SubsystemBase {
     // Initialize motor controllers
     left_leader_ = new CANSparkMax(Constants.kLeftLeaderId, MotorType.kBrushless);
     left_leader_.restoreFactoryDefaults();
-    left_leader_.setInverted(true);
+    left_leader_.setInverted(false);
     left_leader_.setIdleMode(CANSparkMax.IdleMode.kCoast);
     left_leader_.enableVoltageCompensation(12.0);
     
@@ -45,8 +44,12 @@ public class Shooter extends SubsystemBase {
   }
 
   public void setPercent(double value) {
-    double correction = MathUtil.clamp(controller_.calculate(getPercent(), value), -1.0, 1.0);
-    io_.demand = correction;
+    // double correction = MathUtil.clamp(controller_.calculate(getPercent(), value), -1.0, 1.0);
+    io_.demand = value;
+  }
+
+  public void stopMotor() {
+    io_.demand = 0;
   }
 
   @Override
@@ -80,7 +83,7 @@ public class Shooter extends SubsystemBase {
     public static final int kRightLeaderId = 14;
 
     // PID
-    public static final double kP = 0.8;
+    public static final double kP = 2.8;
 
     // Current Limit
     public static final double kCurrentLimit = 40;

@@ -2,38 +2,45 @@ package org.ghrobotics.frc2024;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 
+import org.ghrobotics.frc2024.commands.ArmPID;
 import org.ghrobotics.frc2024.commands.ArmToPosition;
 import org.ghrobotics.frc2024.subsystems.Arm;
-import org.ghrobotics.frc2024.subsystems.Climber;
+import org.ghrobotics.frc2024.subsystems.Feeder;
+// import org.ghrobotics.frc2024.subsystems.Climber;
 import org.ghrobotics.frc2024.subsystems.Intake;
 import org.ghrobotics.frc2024.subsystems.Shooter;
 
 public class Superstructure {
   // Subsystems
   private final Arm arm_;
-  private final Climber climber_;
+  // private final Climber climber_;
   private final Intake intake_;
   private final Shooter shooter_;
+  private final Feeder feeder_;
 
   //Store Position
   public String state = "STOW";
 
   // Constructor
-  public Superstructure(Arm arm, Climber climber, Intake intake, Shooter shooter) {
+  public Superstructure(Arm arm, Intake intake, Shooter shooter, Feeder feeder) {
     arm_ = arm;
-    climber_ = climber;
+    // climber_ = climber;
     intake_ = intake;
     shooter_ = shooter;
+    feeder_ = feeder;
   }
 
   public void periodic() {
     SmartDashboard.putNumber("Shooter Percent", shooter_.getPercent());
-    SmartDashboard.putNumber("Intake Percent", intake_.getPercent());
+    // SmartDashboard.putNumber("Intake Percent", intake_.getPercent());
+    SmartDashboard.putNumber("Arm Angle", Math.toDegrees(arm_.getAngle()));
   }
 
   // Position Setter
@@ -46,12 +53,18 @@ public class Superstructure {
     );
   }
 
+  public Command setAnglePosition(double angle) {
+    return new SequentialCommandGroup(
+      new ArmPID(arm_, angle)
+    ).withTimeout(0.5);
+  }
+
   // Intake Setter
   // Might change to functional later
   public Command setIntake(double percent) {
     return new StartEndCommand(
       () -> intake_.setPercent(percent),
-      () -> intake_.setPercent(0),
+      () -> intake_.stopMotor(),
       intake_
     );
   }
@@ -60,7 +73,7 @@ public class Superstructure {
   public Command setShooter(double percent) {
     return new StartEndCommand(
       () -> shooter_.setPercent(percent),
-      () -> shooter_.setPercent(0),
+      () -> shooter_.stopMotor(),
       shooter_
     );
   }
@@ -74,23 +87,74 @@ public class Superstructure {
     );
   }
 
-  // Jog Left Climber
-  public Command jogLeftClimber(double percent) {
+  public Command shoot() {
+    return Commands.parallel(setIntake(-0.6), setShooter(-0.75));
+  }
+
+  /**
+   * Feeder Setter
+   * @param percent
+   */
+  public Command setFeeder(double percent) {
     return new StartEndCommand(
-      () -> climber_.setLeftPercent(percent),
-      () -> climber_.setLeftPercent(0.1/12),
-      climber_
+      () -> feeder_.setPercent(percent),
+      () -> feeder_.setPercent(0),
+      feeder_
     );
   }
 
-  // Jog Right Climber
-  public Command jogRightClimber(double percent) {
+  public Command shootDelay() {
     return new StartEndCommand(
-      () -> climber_.setRightPercent(percent),
-      () -> climber_.setRightPercent(0.1/12),
-      climber_
+      () -> {
+        setShooter(0.75);
+        new WaitCommand(0.5);
+        Commands.parallel(setIntake(-0.6), setFeeder(-0.75));
+      },
+      () -> {
+        new InstantCommand(() -> {
+          shooter_.stopMotor();
+          intake_.stopMotor();
+          feeder_.stopMotor();
+        });
+      },
+      feeder_  
     );
   }
+
+  public Command setArmPercent(double percent) {
+    return new StartEndCommand(
+      () -> arm_.setPercent(percent),
+      () -> arm_.setPercent(0),
+      arm_
+    );
+  }
+
+
+  public Command setArmPID(double angle) {
+    return new StartEndCommand(
+      () -> arm_.setAnglePID(angle),
+      () -> arm_.setPercent(0),
+      arm_
+    );
+  }
+
+  // // Jog Left Climber
+  // public Command jogLeftClimber(double percent) {
+  //   return new StartEndCommand(
+  //     () -> climber_.setLeftPercent(percent),
+  //     () -> climber_.setLeftPercent(0.1/12),
+  //     climber_
+  //   );
+  // }
+
+  // // Jog Right Climber
+  // public Command jogRightClimber(double percent) {
+  //   return new StartEndCommand(
+  //     () -> climber_.setRightPercent(percent),
+  //     () -> climber_.setRightPercent(0.1/12),
+  //     climber_
+  //   );
+  // }
 
   // GetPosition of Superstructure
   public String getState() {
@@ -98,7 +162,7 @@ public class Superstructure {
   }
 
   public enum Position {
-    STOW(0, "STOW"),
+    STOW(-35, "STOW"),
     SUBWOOFER(0, "SUBWOOFER"),
     AMP(0, "AMP"),
     GROUND_INTAKE(0, "GROUND_INTAKE"),
