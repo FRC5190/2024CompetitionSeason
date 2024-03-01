@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 import org.ghrobotics.frc2024.Superstructure.Position;
+import org.ghrobotics.frc2024.auto.AutoSelector;
 import org.ghrobotics.frc2024.commands.ArmPID;
 import org.ghrobotics.frc2024.commands.DriveTeleop;
 import org.ghrobotics.frc2024.subsystems.Arm;
@@ -63,6 +64,7 @@ public class Robot extends TimedRobot {
   // Superstructure
   private final Superstructure superstructure_ = new Superstructure(arm_, intake_, shooter_, feeder_);
   
+  private final AutoSelector auto_selector_ = new AutoSelector(drive_, robot_state_, superstructure_);
 
   public Command test() {
     return new SequentialCommandGroup(
@@ -96,10 +98,10 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-    // robot_state_.reset(auto_selector_.getStartPosition());
-    // SmartDashboard.putNumber("before", 1);
-    // auto_selector_.getAutonomousCommand().schedule();
-    // SmartDashboard.putNumber("after", 2);
+    robot_state_.reset(auto_selector_.getStartPosition());
+    //SmartDashboard.putNumber("before", 1);
+    auto_selector_.getAutonomousCommand().schedule();
+    //SmartDashboard.putNumber("after", 2);
     
   }
   

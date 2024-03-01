@@ -2,7 +2,6 @@ package org.ghrobotics.frc2024.auto;
 
 import org.ghrobotics.frc2024.RobotState;
 import org.ghrobotics.frc2024.Superstructure;
-import org.ghrobotics.frc2024.Superstructure.Position;
 import org.ghrobotics.frc2024.subsystems.Drive;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -53,7 +52,10 @@ public class AutoSelector {
     );
 
     auto_chooser_ = AutoBuilder.buildAutoChooser();
-    auto_chooser_.setDefaultOption("Two Note Top", new TwoNoteTop(drive_, superstructure_));
+    auto_chooser_.setDefaultOption("One Note Middle Taxi", new OneNoteMiddleTaxi(drive_, superstructure_));
+    auto_chooser_.addOption("One Note Top Taxi", new OneNoteTopTaxi(drive_, superstructure_));
+    auto_chooser_.addOption("One Note Bottom Taxi", new OneNoteBottomTaxi(drive_, superstructure_));
+    auto_chooser_.addOption("Two Note Top", new TwoNoteTop(drive_, superstructure_));
     auto_chooser_.addOption("Two Note Middle", new TwoNoteMiddle(drive_, superstructure_));
     auto_chooser_.addOption("Two Note Bottom", new TwoNoteBottom(drive_, superstructure_));
 
@@ -66,7 +68,19 @@ public class AutoSelector {
 
   // this is here just so it stopped giving me errors we need to fix this
   PathPlannerPath pickup_top = PathPlannerPath.fromPathFile("Pickup Top");
-  public Pose2d getStartPosition(){
+  PathPlannerPath pickup_middle = PathPlannerPath.fromPathFile("Pickup Middle");
+  PathPlannerPath pickup_bottom = PathPlannerPath.fromPathFile("Pickup Bottom");
+
+  public Pose2d getStartPosition() {
+    if (auto_chooser_.getSelected() instanceof TwoNoteBottom || auto_chooser_.getSelected() instanceof OneNoteBottomTaxi) {
+      return pickup_bottom.getStartingDifferentialPose();
+    }
+    else if (auto_chooser_.getSelected() instanceof TwoNoteMiddle || auto_chooser_.getSelected() instanceof OneNoteMiddleTaxi) {
+      return pickup_middle.getStartingDifferentialPose();
+    }
+    else if (auto_chooser_.getSelected() instanceof TwoNoteTop || auto_chooser_.getSelected() instanceof OneNoteTopTaxi) {
+      return pickup_top.getStartingDifferentialPose();
+    }
     return pickup_top.getStartingDifferentialPose();
   }
 
