@@ -15,6 +15,9 @@ public class LED extends SubsystemBase {
 
   private int led_rainbowFirstPixelHue = 0;
 
+
+  private OutputType output_type_ = OutputType.DISABLED_READY;
+  private StandardLEDOutput standard_led_output_;
   
   public LED() {
     // Initialize
@@ -29,12 +32,22 @@ public class LED extends SubsystemBase {
   @Override
   public void periodic(){
     // Fill the buffer with a rainbow
-    rainbow();
+
+    switch(output_type_){
+      case RAINBOW: 
+        rainbow();
+
+      case DISABLED:
+        break;
+    }
     // Set the LEDs
     led_.setData(led_buffer_);
   }
   
-  
+  public enum OutputType {
+    RAINBOW, DISABLED
+    //AUTOBALANCING, ERROR, LIMELIGHT_ERROR
+  }
   private void rainbow() {
     // For every pixel
     for (var i = 0; i < led_buffer_.getLength(); i++) {

@@ -203,12 +203,9 @@ public class Robot extends TimedRobot {
 
     //i'm lost here ngl
     if (isDisabled()) {
-      //make it off idk
-      //led_.setOutput(LED.OutputType.DISABLED_READY);
+      led_.setOutput(LED.OutputType.DISABLED);
     } else if(isEmoting){
-      
-      //make it rainbow
-      //led_.setOutput();
+      led_.setOutput(RAINBOW);
   } 
   
 }
