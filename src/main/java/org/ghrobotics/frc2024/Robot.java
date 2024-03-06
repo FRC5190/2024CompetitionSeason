@@ -43,7 +43,7 @@ public class Robot extends TimedRobot {
   private final Shooter shooter_ = new Shooter();
   private final Feeder feeder_ = new Feeder();
   private final LEDs led_ = new LED();
-
+  private boolean isEmoting;
   // private final ArmPID arm_command = new ArmPID();
 
   // Robot State
@@ -191,6 +191,10 @@ public class Robot extends TimedRobot {
     operator_controller_.pov(0).whileTrue(superstructure_.setArmPercent(0.1));
     
     operator_controller_.pov(180).whileTrue(superstructure_.setArmPercent(-0.1));
+
+
+   operator_controller_.rightTrigger().onTrue(() -> isEmoting = !isEmoting);
+
   }
 
 
@@ -199,11 +203,12 @@ public class Robot extends TimedRobot {
 
     //i'm lost here ngl
     if (isDisabled()) {
-      // Limelight Not Connected
+      //make it off idk
       //led_.setOutput(LED.OutputType.DISABLED_READY);
-    } else {
+    } else if(isEmoting){
       
-      //led_.setOutput(StandardLEDOutput.AUTO);
+      //make it rainbow
+      //led_.setOutput();
   } 
   
 }
