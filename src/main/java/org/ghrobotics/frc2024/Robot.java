@@ -26,6 +26,8 @@ import org.ghrobotics.frc2024.subsystems.Feeder;
 import org.ghrobotics.frc2024.subsystems.Intake;
 import org.ghrobotics.frc2024.subsystems.Shooter;
 
+import org.ghrobotics.frc2023.subsystems.LEDs;
+
 /**
 * The VM is configured to automatically run this class, and to call the functions corresponding to
 * each mode, as described in the TimedRobot documentation. If you change the name of this class or
@@ -40,7 +42,8 @@ public class Robot extends TimedRobot {
   private final Intake intake_ = new Intake();
   private final Shooter shooter_ = new Shooter();
   private final Feeder feeder_ = new Feeder();
-  
+  private final LEDs led_ = new LED();
+
   // private final ArmPID arm_command = new ArmPID();
 
   // Robot State
@@ -91,6 +94,8 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Robot Angle", drive_.getAngle().getDegrees());
 
     SmartDashboard.putNumber("estimated angle", robot_state_.getDegree());
+
+    updateLEDs();
   }
 
 
@@ -187,4 +192,19 @@ public class Robot extends TimedRobot {
     
     operator_controller_.pov(180).whileTrue(superstructure_.setArmPercent(-0.1));
   }
+
+
+  public void updateLEDs() {
+    // Disabled State
+
+    //i'm lost here ngl
+    if (isDisabled()) {
+      // Limelight Not Connected
+      //led_.setOutput(LED.OutputType.DISABLED_READY);
+    } else {
+      
+      //led_.setOutput(StandardLEDOutput.AUTO);
+  } 
+  
+}
 }
