@@ -28,7 +28,7 @@ import org.ghrobotics.frc2024.subsystems.Arm;
 import org.ghrobotics.frc2024.subsystems.Drive;
 import org.ghrobotics.frc2024.subsystems.Feeder;
 import org.ghrobotics.frc2024.subsystems.Intake;
-import org.ghrobotics.frc2024.subsystems.LED;
+import org.ghrobotics.frc2024.subsystems.Leds;
 import org.ghrobotics.frc2024.subsystems.Shooter;
 import org.ghrobotics.frc2024.subsystems.Leds;
 

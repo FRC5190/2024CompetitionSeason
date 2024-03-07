@@ -1,7 +1,5 @@
 package org.ghrobotics.frc2024.subsystems;
-
 import java.util.Optional;
-
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DriverStation;
