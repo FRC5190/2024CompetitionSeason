@@ -121,8 +121,18 @@ public class Arm extends SubsystemBase {
       fb_.reset(io_.angle, io_.angular_velocity);
     }
 
+    pid_.getSetpoint();
+
     // Write outputs
     switch (output_type_) {
+      case BRAKE:
+        double current_angle = Math.toDegrees(getAngle());
+        pid_.setSetpoint(current_angle);
+        double output = MathUtil.clamp(pid_.calculate(current_angle), -0.05, 0.05);
+
+        leader_.set(output);
+        follower_.set(-output);
+        break;
       case PERCENT:
         leader_.set(io_.demand);
         follower_.set(-io_.demand);
@@ -182,13 +192,17 @@ public class Arm extends SubsystemBase {
     reset_pid_ = true;
   }
 
+  public void setBrake() {
+    output_type_ = OutputType.BRAKE;
+  }
+
   /**
    * Set Arm Angle using PID
    * @param angle in Degrees
    */
   public void setAnglePID(double angle) {
     pid_.setSetpoint(angle);
-    SmartDashboard.putNumber("Angle Calculate", pid_.calculate(Math.toDegrees(getAngle())));
+    // SmartDashboard.putNumber("Angle Calculate", pid_.calculate(Math.toDegrees(getAngle())));
     double output = MathUtil.clamp(pid_.calculate(Math.toDegrees(getAngle())), -0.2, 0.35);
     SmartDashboard.putNumber("Arm output", output);
 
@@ -250,7 +264,7 @@ public class Arm extends SubsystemBase {
 
   // Output Type
   private enum OutputType {
-    PERCENT, ANGLE
+    PERCENT, ANGLE, BRAKE
   }
 
   //IO

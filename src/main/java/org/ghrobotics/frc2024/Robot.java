@@ -149,6 +149,7 @@ public class Robot extends TimedRobot {
   public void simulationPeriodic() {}
 
   private void setupTeleopControls() {
+
     // Driver Control
     driver_controller_.rightTrigger().whileTrue(superstructure_.setShooter(-0.75));
 
@@ -162,16 +163,8 @@ public class Robot extends TimedRobot {
 
     driver_controller_.b().whileTrue(superstructure_.shoot());
 
-    // This one doesn't work
-    driver_controller_.y().whileTrue(superstructure_.shootDelay());
-
-    driver_controller_.a().whileTrue(superstructure_.setFeeder(0.75));
-
-    driver_controller_.pov(270).onTrue(superstructure_.setArmPercent(0));
-
-
+    
     // Operator Control
-    // hold_position.onFalse(new InstantCommand(() -> arm_.setPercent(0.056)));
 
     operator_controller_.leftTrigger().whileTrue(superstructure_.setArmPercent(brake_value_));
 

@@ -49,11 +49,7 @@ public class ArmPID extends Command {
 
   @Override
   public void end(boolean interrupted) {
-    // if(arm_.getAngle() > 40) {
-    //   arm_.setPercent(0.02);;
-    // } else {
-    //   arm_.setAnglePID(position_ + 5);
-    // }
+    arm_.setBrake();
     timer_.reset();
   }
 
