@@ -4,6 +4,8 @@
 
 package org.ghrobotics.frc2024;
 
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -16,6 +18,8 @@ import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
+import java.util.Optional;
+
 import org.ghrobotics.frc2024.Superstructure.Position;
 import org.ghrobotics.frc2024.commands.ArmPID;
 import org.ghrobotics.frc2024.commands.DriveTeleop;
@@ -24,9 +28,10 @@ import org.ghrobotics.frc2024.subsystems.Arm;
 import org.ghrobotics.frc2024.subsystems.Drive;
 import org.ghrobotics.frc2024.subsystems.Feeder;
 import org.ghrobotics.frc2024.subsystems.Intake;
+import org.ghrobotics.frc2024.subsystems.LED;
 import org.ghrobotics.frc2024.subsystems.Shooter;
+import org.ghrobotics.frc2024.subsystems.Leds;
 
-import org.ghrobotics.frc2023.subsystems.LEDs;
 
 /**
 * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -42,7 +47,6 @@ public class Robot extends TimedRobot {
   private final Intake intake_ = new Intake();
   private final Shooter shooter_ = new Shooter();
   private final Feeder feeder_ = new Feeder();
-  private final LEDs led_ = new LED();
   private boolean isEmoting;
   // private final ArmPID arm_command = new ArmPID();
 
@@ -66,6 +70,7 @@ public class Robot extends TimedRobot {
   // Superstructure
   private final Superstructure superstructure_ = new Superstructure(arm_, intake_, shooter_, feeder_);
   
+  private final Leds led_ = new Leds();
 
   public Command test() {
     return new SequentialCommandGroup(
@@ -78,6 +83,16 @@ public class Robot extends TimedRobot {
     drive_.setDefaultCommand(new DriveTeleop(drive_, robot_state_, driver_controller_));
 
     setupTeleopControls();
+    Optional<Alliance> ally = DriverStation.getAlliance();
+     if (ally.isPresent()) {
+          if (ally.get() == Alliance.Red) {
+              led_.setOutput(Leds.OutputType.RED);
+         }
+          if (ally.get() == Alliance.Blue) {
+              led_.setOutput(Leds.OutputType.BLUE);
+          }
+      }
+    
   }
   
   @Override
@@ -95,7 +110,6 @@ public class Robot extends TimedRobot {
 
     SmartDashboard.putNumber("estimated angle", robot_state_.getDegree());
 
-    updateLEDs();
   }
 
 
@@ -193,20 +207,11 @@ public class Robot extends TimedRobot {
     operator_controller_.pov(180).whileTrue(superstructure_.setArmPercent(-0.1));
 
 
-   operator_controller_.rightTrigger().onTrue(() -> isEmoting = !isEmoting);
+   
 
   }
 
 
-  public void updateLEDs() {
-    // Disabled State
-
-    //i'm lost here ngl
-    if (isDisabled()) {
-      led_.setOutput(LED.OutputType.DISABLED);
-    } else if(isEmoting){
-      led_.setOutput(RAINBOW);
-  } 
   
 }
-}
+
