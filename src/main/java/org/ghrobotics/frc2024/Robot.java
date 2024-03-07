@@ -20,6 +20,7 @@ import org.ghrobotics.frc2024.Superstructure.Position;
 import org.ghrobotics.frc2024.auto.AutoSelector;
 import org.ghrobotics.frc2024.commands.ArmPID;
 import org.ghrobotics.frc2024.commands.DriveTeleop;
+import org.ghrobotics.frc2024.commands.RunRobot;
 import org.ghrobotics.frc2024.subsystems.Arm;
 // import org.ghrobotics.frc2024.subsystems.Climber;
 import org.ghrobotics.frc2024.subsystems.Drive;
@@ -44,8 +45,11 @@ public class Robot extends TimedRobot {
   
   // private final ArmPID arm_command = new ArmPID();
 
+  Command runrobot = new RunRobot(drive_);
+
   // Robot State
   private final RobotState robot_state_ = new RobotState(drive_);
+  private final Superstructure superstructure_ = new Superstructure(arm_, intake_, shooter_, feeder_);
 
   // Telemetry
   private final Telemetry telemetry_ = new Telemetry(robot_state_, arm_);
@@ -62,13 +66,13 @@ public class Robot extends TimedRobot {
   // Playstation controller just for testing
   // private final CommandPS4Controller ps4_controller_ = new CommandPS4Controller(0);
   // Superstructure
-  private final Superstructure superstructure_ = new Superstructure(arm_, intake_, shooter_, feeder_);
+  // private final Superstructure superstructure_ = new Superstructure(arm_, intake_, shooter_, feeder_);
   
-  private final AutoSelector auto_selector_ = new AutoSelector(drive_, robot_state_, superstructure_);
+  private final AutoSelector auto_selector_ = new AutoSelector(drive_, robot_state_, superstructure_, arm_);
 
   public Command test() {
     return new SequentialCommandGroup(
-      superstructure_.setPosition(Position.STOW),
+      // superstructure_.setPosition(Position.STOW),
       new WaitCommand(3.0)
     );
   }
@@ -98,15 +102,21 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-    robot_state_.reset(auto_selector_.getStartPosition());
-    //SmartDashboard.putNumber("before", 1);
-    auto_selector_.getAutonomousCommand().schedule();
+    // robot_state_.reset(auto_selector_.getStartPosition());
+    // //SmartDashboard.putNumber("before", 1);
+    auto_selector_.basicAutoCommand().schedule();
     //SmartDashboard.putNumber("after", 2);
+    // runrobot.schedule();
+    drive_.setBrakeMode(true);
+    arm_.setBrakeMode(true);
     
   }
   
   @Override
-  public void autonomousPeriodic() {}
+  public void autonomousPeriodic() {
+    // shooter_.setPercent(-0.50);
+
+  }
   
   // Might need this in the future
   // robot_state_.reset(robot_state_.getPosition());
@@ -160,7 +170,7 @@ public class Robot extends TimedRobot {
     // Driver Control
     driver_controller_.rightTrigger().whileTrue(superstructure_.setShooter(-0.75));
 
-    driver_controller_.leftTrigger().whileTrue(superstructure_.setIntake(-0.50));
+    driver_controller_.leftTrigger().whileTrue(superstructure_.setIntake(-0.40));
 
     driver_controller_.leftBumper().whileTrue(superstructure_.setIntake(0.15));
 
@@ -191,7 +201,7 @@ public class Robot extends TimedRobot {
 
     operator_controller_.x().onTrue(new ArmPID(arm_, 60));
 
-    operator_controller_.pov(0).whileTrue(superstructure_.setArmPercent(0.1));
+    operator_controller_.pov(0).whileTrue(superstructure_.setArmPercent(0.20));
     
     operator_controller_.pov(180).whileTrue(superstructure_.setArmPercent(-0.1));
   }
