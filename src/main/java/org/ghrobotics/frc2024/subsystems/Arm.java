@@ -253,7 +253,6 @@ public class Arm extends SubsystemBase {
   }
 
 
-
   public double getAngularVelocitySetpoint() {
     return fb_.getSetpoint().velocity;
   }
