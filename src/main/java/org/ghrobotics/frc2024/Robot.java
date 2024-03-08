@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 import org.ghrobotics.frc2024.Superstructure.Position;
+import org.ghrobotics.frc2024.auto.AutoSelector;
 import org.ghrobotics.frc2024.commands.ArmPID;
 import org.ghrobotics.frc2024.commands.DriveTeleop;
 import org.ghrobotics.frc2024.subsystems.Arm;
@@ -40,6 +41,8 @@ public class Robot extends TimedRobot {
   private final Intake intake_ = new Intake();
   private final Shooter shooter_ = new Shooter();
   private final Feeder feeder_ = new Feeder();
+
+  
   
   // private final ArmPID arm_command = new ArmPID();
 
@@ -62,7 +65,7 @@ public class Robot extends TimedRobot {
   // private final CommandPS4Controller ps4_controller_ = new CommandPS4Controller(0);
   // Superstructure
   private final Superstructure superstructure_ = new Superstructure(arm_, intake_, shooter_, feeder_);
-  
+  private final AutoSelector auto_selector_= new AutoSelector(drive_, robot_state_, superstructure_, arm_);
 
   public Command test() {
     return new SequentialCommandGroup(
@@ -75,6 +78,8 @@ public class Robot extends TimedRobot {
     drive_.setDefaultCommand(new DriveTeleop(drive_, robot_state_, driver_controller_));
 
     setupTeleopControls();
+    drive_.setBrakeMode(true);
+    robot_state_.reset(auto_selector_.getStartingPose());
   }
   
   @Override
@@ -91,11 +96,20 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Robot Angle", drive_.getAngle().getDegrees());
 
     SmartDashboard.putNumber("estimated angle", robot_state_.getDegree());
+    // SmartDashboard.putNumber("estimated x", robot_state_.getPosition().getX());
+    // SmartDashboard.putNumber("estimated y", robot_state_.getPosition().getY());
+    robot_state_.update();
   }
 
 
   @Override
-  public void autonomousInit() {}
+  public void autonomousInit() {
+    // robot_state_.reset(auto_selector_.getStartingPose());
+    auto_selector_.followPath().schedule();
+
+    // drive_.setBrakeMode(true);
+    arm_.setBrakeMode(true);
+  }
   
   @Override
   public void autonomousPeriodic() {}
@@ -105,8 +119,8 @@ public class Robot extends TimedRobot {
   // robot_state_.update();
   @Override
   public void teleopInit() {
-    drive_.setBrakeMode(true);
-    arm_.setBrakeMode(true);
+    // drive_.setBrakeMode(true);
+    // arm_.setBrakeMode(true);
 
     // test().schedule();
   }
@@ -129,8 +143,8 @@ public class Robot extends TimedRobot {
   
   @Override
   public void disabledInit() {
-    drive_.setBrakeMode(false);
-    arm_.setBrakeMode(false);
+    // drive_.setBrakeMode(false);
+    // arm_.setBrakeMode(false);
   }
   
   @Override
