@@ -177,6 +177,8 @@ public class Robot extends TimedRobot {
 
     driver_controller_.b().whileTrue(superstructure_.shoot());
 
+    driver_controller_.a().whileTrue(superstructure_.setFeeder(-0.5));
+
     
     // Operator Control
 
