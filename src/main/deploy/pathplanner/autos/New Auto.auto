@@ -1,0 +1,37 @@
+{
+  "version": 1.0,
+  "startingPose": null,
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": null
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Pickup Top"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Shoot Top"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": null
+          }
+        }
+      ]
+    }
+  },
+  "folder": null,
+  "choreoAuto": false
+}

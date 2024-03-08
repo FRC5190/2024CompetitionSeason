@@ -36,6 +36,7 @@ public class Intake extends SubsystemBase {
     // Read inputs.
     io_.current_left_ = leader_left_.getOutputCurrent();
     io_.current_right_ = leader_right_.getOutputCurrent();
+
     leader_left_.set(io_.left_demand);
     leader_right_.set(io_.right_demand);
   }

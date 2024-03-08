@@ -1,13 +1,23 @@
 package org.ghrobotics.frc2024.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+import org.ghrobotics.frc2024.RobotState;
+
 import com.kauailabs.navx.frc.AHRS;
+// import com.pathplanner.lib.auto.AutoBuilder;
+// import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
+// import com.pathplanner.lib.util.PIDConstants;
+// import com.pathplanner.lib.util.ReplanningConfig;
+
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -28,7 +38,7 @@ public class Drive extends SubsystemBase {
   SwerveDriveKinematics kinematics_ = new SwerveDriveKinematics(
     Constants.kFrontLeftLocation, Constants.kFrontRightLocation,
     Constants.kBackLeftLocation, Constants.kBackRightLocation);
-  
+
   // IO
   private final IO io_ = new IO();
   private OutputType output_type_ = OutputType.OPEN_LOOP;
@@ -87,6 +97,12 @@ public class Drive extends SubsystemBase {
     return kinematics_;
   }
   
+
+  // Getter for ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+  public ChassisSpeeds getSpeeds() {
+    return io_.speeds;
+  }
+
   // Set Speeds
   public void setSpeeds(ChassisSpeeds speeds, OutputType output_type) {
     io_.speeds = speeds;
@@ -111,7 +127,7 @@ public class Drive extends SubsystemBase {
     back_left_.setAngle(-45);
     back_right_.setAngle(45);
   }
-  
+
   // Output Type
   public enum OutputType {
     VELOCITY, OPEN_LOOP
