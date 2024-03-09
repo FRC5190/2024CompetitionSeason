@@ -24,6 +24,7 @@ import org.ghrobotics.frc2024.subsystems.Arm;
 import org.ghrobotics.frc2024.subsystems.Drive;
 import org.ghrobotics.frc2024.subsystems.Feeder;
 import org.ghrobotics.frc2024.subsystems.Intake;
+import org.ghrobotics.frc2024.subsystems.Limelight;
 import org.ghrobotics.frc2024.subsystems.Shooter;
 
 /**
@@ -40,11 +41,12 @@ public class Robot extends TimedRobot {
   private final Intake intake_ = new Intake();
   private final Shooter shooter_ = new Shooter();
   private final Feeder feeder_ = new Feeder();
+  private final Limelight limelight_ = new Limelight("limelight");
   
   // private final ArmPID arm_command = new ArmPID();
 
   // Robot State
-  private final RobotState robot_state_ = new RobotState(drive_);
+  private final RobotState robot_state_ = new RobotState(drive_, limelight_);
 
   // Telemetry
   private final Telemetry telemetry_ = new Telemetry(robot_state_, arm_);
@@ -91,6 +93,9 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Robot Angle", drive_.getAngle().getDegrees());
 
     SmartDashboard.putNumber("estimated angle", robot_state_.getDegree());
+
+    SmartDashboard.putNumber("Vision x", limelight_.getBotPose2d().getX());
+    SmartDashboard.putNumber("Vision y", limelight_.getBotPose2d().getY());
   }
 
 
@@ -105,6 +110,7 @@ public class Robot extends TimedRobot {
   // robot_state_.update();
   @Override
   public void teleopInit() {
+    robot_state_.reset(limelight_.getEstimatedVisionRobotPose());
     drive_.setBrakeMode(true);
     arm_.setBrakeMode(true);
 
@@ -113,6 +119,7 @@ public class Robot extends TimedRobot {
   
   @Override
   public void teleopPeriodic() {
+    robot_state_.update();
     if (Math.toDegrees(arm_.getAngle()) < 15 && Math.toDegrees(arm_.getAngle()) > 0) {
       brake_value_ = 0.05;
     }
@@ -162,6 +169,8 @@ public class Robot extends TimedRobot {
     // driver_controller_.pov(180).whileTrue(superstructure_.setShooter(0.3));
 
     driver_controller_.b().whileTrue(superstructure_.shoot());
+
+    driver_controller_.pov(180).onTrue(new InstantCommand(() -> robot_state_.reset(limelight_.getEstimatedVisionRobotPose())));
 
     
     // Operator Control
