@@ -27,7 +27,7 @@ public class Feeder extends SubsystemBase{
   }
 
   public void stopMotor() {
-    leader_.set(0);
+    io_.demand = 0;
   }
 
   public double getPercent() {

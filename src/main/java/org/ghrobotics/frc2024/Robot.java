@@ -4,6 +4,8 @@
 
 package org.ghrobotics.frc2024;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -65,7 +67,7 @@ public class Robot extends TimedRobot {
   // private final CommandPS4Controller ps4_controller_ = new CommandPS4Controller(0);
   // Superstructure
   private final Superstructure superstructure_ = new Superstructure(arm_, intake_, shooter_, feeder_);
-  private final AutoSelector auto_selector_= new AutoSelector(drive_, robot_state_, superstructure_, arm_);
+  private final AutoSelector auto_selector_= new AutoSelector(drive_, robot_state_, superstructure_, arm_, intake_, shooter_, feeder_);
 
   public Command test() {
     return new SequentialCommandGroup(
@@ -104,7 +106,10 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-    // robot_state_.reset(auto_selector_.getStartingPose());
+    robot_state_.reset(new Pose2d(
+      auto_selector_.getStartingPose().getX(), 
+      auto_selector_.getStartingPose().getY(), 
+      Rotation2d.fromDegrees(0)));
     auto_selector_.followPath().schedule();
 
     // drive_.setBrakeMode(true);
@@ -120,7 +125,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopInit() {
     // drive_.setBrakeMode(true);
-    // arm_.setBrakeMode(true);
+    arm_.setBrakeMode(true);
 
     // test().schedule();
   }
@@ -167,7 +172,9 @@ public class Robot extends TimedRobot {
     // Driver Control
     driver_controller_.rightTrigger().whileTrue(superstructure_.setShooter(-0.75));
 
-    driver_controller_.leftTrigger().whileTrue(superstructure_.setIntake(-0.50));
+    driver_controller_.rightBumper().whileTrue(superstructure_.setShooter(-0.5));
+
+    driver_controller_.leftTrigger().whileTrue(superstructure_.setIntake(-0.25));
 
     driver_controller_.leftBumper().whileTrue(superstructure_.setIntake(0.15));
 
@@ -177,7 +184,7 @@ public class Robot extends TimedRobot {
 
     driver_controller_.b().whileTrue(superstructure_.shoot());
 
-    driver_controller_.a().whileTrue(superstructure_.setFeeder(-0.5));
+    driver_controller_.a().whileTrue(superstructure_.setFeeder(0.5));
 
     
     // Operator Control
@@ -188,7 +195,7 @@ public class Robot extends TimedRobot {
 
     operator_controller_.a().onTrue(new ArmPID(arm_, 2));
 
-    operator_controller_.y().onTrue(new ArmPID(arm_, 28));
+    operator_controller_.y().onTrue(new ArmPID(arm_, 36));
 
     operator_controller_.x().onTrue(new ArmPID(arm_, 60));
 
