@@ -124,7 +124,10 @@ public class Superstructure {
   public Command setArmPercent(double percent) {
     return new StartEndCommand(
       () -> arm_.setPercent(percent),
-      () -> arm_.setPercent(0),
+      () -> {
+        arm_.setPercent(0);
+        arm_.setBrake(Math.toDegrees(arm_.getAngle()));
+      },
       arm_
     );
   }

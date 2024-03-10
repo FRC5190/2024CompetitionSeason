@@ -4,6 +4,8 @@
 
 package org.ghrobotics.frc2024;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -17,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 import org.ghrobotics.frc2024.Superstructure.Position;
+import org.ghrobotics.frc2024.auto.AutoSelector;
 import org.ghrobotics.frc2024.commands.ArmPID;
 import org.ghrobotics.frc2024.commands.DriveTeleop;
 import org.ghrobotics.frc2024.subsystems.Arm;
@@ -40,6 +43,8 @@ public class Robot extends TimedRobot {
   private final Intake intake_ = new Intake();
   private final Shooter shooter_ = new Shooter();
   private final Feeder feeder_ = new Feeder();
+
+  
   
   // private final ArmPID arm_command = new ArmPID();
 
@@ -62,7 +67,7 @@ public class Robot extends TimedRobot {
   // private final CommandPS4Controller ps4_controller_ = new CommandPS4Controller(0);
   // Superstructure
   private final Superstructure superstructure_ = new Superstructure(arm_, intake_, shooter_, feeder_);
-  
+  private final AutoSelector auto_selector_= new AutoSelector(drive_, robot_state_, superstructure_, arm_, intake_, shooter_, feeder_);
 
   public Command test() {
     return new SequentialCommandGroup(
@@ -75,6 +80,8 @@ public class Robot extends TimedRobot {
     drive_.setDefaultCommand(new DriveTeleop(drive_, robot_state_, driver_controller_));
 
     setupTeleopControls();
+    drive_.setBrakeMode(true);
+    robot_state_.reset(auto_selector_.getStartingPose());
   }
   
   @Override
@@ -91,11 +98,23 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Robot Angle", drive_.getAngle().getDegrees());
 
     SmartDashboard.putNumber("estimated angle", robot_state_.getDegree());
+    // SmartDashboard.putNumber("estimated x", robot_state_.getPosition().getX());
+    // SmartDashboard.putNumber("estimated y", robot_state_.getPosition().getY());
+    robot_state_.update();
   }
 
 
   @Override
-  public void autonomousInit() {}
+  public void autonomousInit() {
+    robot_state_.reset(new Pose2d(
+      auto_selector_.getStartingPose().getX(), 
+      auto_selector_.getStartingPose().getY(), 
+      Rotation2d.fromDegrees(0)));
+    auto_selector_.followPath().schedule();
+
+    // drive_.setBrakeMode(true);
+    arm_.setBrakeMode(true);
+  }
   
   @Override
   public void autonomousPeriodic() {}
@@ -105,7 +124,7 @@ public class Robot extends TimedRobot {
   // robot_state_.update();
   @Override
   public void teleopInit() {
-    drive_.setBrakeMode(true);
+    // drive_.setBrakeMode(true);
     arm_.setBrakeMode(true);
 
     // test().schedule();
@@ -129,8 +148,8 @@ public class Robot extends TimedRobot {
   
   @Override
   public void disabledInit() {
-    drive_.setBrakeMode(false);
-    arm_.setBrakeMode(false);
+    // drive_.setBrakeMode(false);
+    // arm_.setBrakeMode(false);
   }
   
   @Override
@@ -153,7 +172,9 @@ public class Robot extends TimedRobot {
     // Driver Control
     driver_controller_.rightTrigger().whileTrue(superstructure_.setShooter(-0.75));
 
-    driver_controller_.leftTrigger().whileTrue(superstructure_.setIntake(-0.50));
+    driver_controller_.rightBumper().whileTrue(superstructure_.setShooter(-0.5));
+
+    driver_controller_.leftTrigger().whileTrue(superstructure_.setIntake(-0.25));
 
     driver_controller_.leftBumper().whileTrue(superstructure_.setIntake(0.15));
 
@@ -162,6 +183,8 @@ public class Robot extends TimedRobot {
     // driver_controller_.pov(180).whileTrue(superstructure_.setShooter(0.3));
 
     driver_controller_.b().whileTrue(superstructure_.shoot());
+
+    driver_controller_.a().whileTrue(superstructure_.setFeeder(0.5));
 
     
     // Operator Control
@@ -172,7 +195,7 @@ public class Robot extends TimedRobot {
 
     operator_controller_.a().onTrue(new ArmPID(arm_, 2));
 
-    operator_controller_.y().onTrue(new ArmPID(arm_, 28));
+    operator_controller_.y().onTrue(new ArmPID(arm_, 36));
 
     operator_controller_.x().onTrue(new ArmPID(arm_, 60));
 
