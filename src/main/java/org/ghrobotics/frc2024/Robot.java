@@ -7,6 +7,7 @@ package org.ghrobotics.frc2024;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -45,6 +46,8 @@ public class Robot extends TimedRobot {
   private final Shooter shooter_ = new Shooter();
   private final Feeder feeder_ = new Feeder();
   private final Limelight limelight_ = new Limelight("limelight");
+
+  private final Field2d field_ = new Field2d();
   
   // private final ArmPID arm_command = new ArmPID();
 
@@ -79,8 +82,9 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     drive_.setDefaultCommand(new DriveTeleop(drive_, robot_state_, driver_controller_));
 
+    SmartDashboard.putData("field", field_);
     setupTeleopControls();
-    drive_.setBrakeMode(true);
+    // drive_.setBrakeMode(true);
     robot_state_.reset(auto_selector_.getStartingPose());
   }
   
@@ -90,6 +94,7 @@ public class Robot extends TimedRobot {
 
     superstructure_.periodic();
     telemetry_.periodic();
+    robot_state_.update();
 
     // SmartDashboard.putNumber("Leader Encoder angle deg", Math.toDegrees(arm_.getLeaderAngle()));
     // SmartDashboard.putNumber("Follower Encoder angle deg", Math.toDegrees(arm_.getFollowerAngle()));
@@ -101,6 +106,13 @@ public class Robot extends TimedRobot {
 
     SmartDashboard.putNumber("Vision x", limelight_.getBotPose2d().getX());
     SmartDashboard.putNumber("Vision y", limelight_.getBotPose2d().getY());
+    SmartDashboard.putNumber("Vision Degrees", limelight_.getBotPose2d().getRotation().getDegrees());
+
+    SmartDashboard.putNumber("Odometry x", robot_state_.getPosition().getX());
+    SmartDashboard.putNumber("Odometry y", robot_state_.getPosition().getY());
+    SmartDashboard.putNumber("Odometry Degrees", robot_state_.getPosition().getRotation().getDegrees());
+
+    field_.setRobotPose(limelight_.getBotPose2d());
   }
 
 
@@ -112,7 +124,7 @@ public class Robot extends TimedRobot {
       Rotation2d.fromDegrees(0)));
     auto_selector_.followPath().schedule();
 
-    // drive_.setBrakeMode(true);
+    drive_.setBrakeMode(true);
     arm_.setBrakeMode(true);
   }
   
@@ -124,7 +136,7 @@ public class Robot extends TimedRobot {
   // robot_state_.update();
   @Override
   public void teleopInit() {
-    robot_state_.reset(limelight_.getEstimatedVisionRobotPose());
+    robot_state_.reset(limelight_.getBotPose2d());
     drive_.setBrakeMode(true);
     arm_.setBrakeMode(true);
 
@@ -150,8 +162,8 @@ public class Robot extends TimedRobot {
   
   @Override
   public void disabledInit() {
-    // drive_.setBrakeMode(false);
-    // arm_.setBrakeMode(false);
+    drive_.setBrakeMode(false);
+    arm_.setBrakeMode(false);
   }
   
   @Override
@@ -187,6 +199,8 @@ public class Robot extends TimedRobot {
     driver_controller_.b().whileTrue(superstructure_.shoot());
 
     driver_controller_.a().whileTrue(superstructure_.setFeeder(0.5));
+
+    // driver_controller_.a().whileTrue(superstructure_.setFeeder(0.5));
 
     
     // Operator Control

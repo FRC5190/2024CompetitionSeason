@@ -67,7 +67,7 @@ public class Limelight extends SubsystemBase {
   }
 
   public Pose2d getBotPose2d() {
-    return LimelightHelpers.getBotPose2d("limelight");
+    return LimelightHelpers.getBotPose2d_wpiBlue("limelight");
   }
 
   /**
