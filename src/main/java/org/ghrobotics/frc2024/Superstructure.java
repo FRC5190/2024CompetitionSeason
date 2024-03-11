@@ -15,6 +15,7 @@ import org.ghrobotics.frc2024.subsystems.Arm;
 import org.ghrobotics.frc2024.subsystems.Feeder;
 // import org.ghrobotics.frc2024.subsystems.Climber;
 import org.ghrobotics.frc2024.subsystems.Intake;
+import org.ghrobotics.frc2024.subsystems.Limelight;
 import org.ghrobotics.frc2024.subsystems.Shooter;
 
 public class Superstructure {
@@ -24,23 +25,30 @@ public class Superstructure {
   private final Intake intake_;
   private final Shooter shooter_;
   private final Feeder feeder_;
+  private final Limelight limelight_;
 
   //Store Position
   public String state = "STOW";
 
   // Constructor
-  public Superstructure(Arm arm, Intake intake, Shooter shooter, Feeder feeder) {
+  public Superstructure(Arm arm, Intake intake, Shooter shooter, Feeder feeder, Limelight limelight) {
     arm_ = arm;
     // climber_ = climber;
     intake_ = intake;
     shooter_ = shooter;
     feeder_ = feeder;
+    limelight_ = limelight;
   }
 
   public void periodic() {
     SmartDashboard.putNumber("Shooter Percent", shooter_.getPercent());
     // SmartDashboard.putNumber("Intake Percent", intake_.getPercent());
     SmartDashboard.putNumber("Arm Angle", Math.toDegrees(arm_.getAngle()));
+
+    // Checks output current to see if note has intaked or not (current > 40 means intaked)
+    if (intake_.getLeftOutputCurrent() > 40) {
+      LimelightHelpers.setLEDMode_ForceBlink(limelight_.getName());
+    }
   }
 
   // Position Setter
