@@ -127,8 +127,9 @@ public class Arm extends SubsystemBase {
     switch (output_type_) {
       case BRAKE:
         double current_angle = Math.toDegrees(getAngle());
-        pid_.setSetpoint(current_angle);
+        pid_.setSetpoint(io_.brake_angle);
         double output = MathUtil.clamp(pid_.calculate(current_angle), -0.05, 0.05);
+        SmartDashboard.putNumber("1output for brake angle", output);
 
         leader_.set(output);
         follower_.set(-output);
@@ -192,8 +193,11 @@ public class Arm extends SubsystemBase {
     reset_pid_ = true;
   }
 
-  public void setBrake() {
+  public void setBrake(double brake_angle) {
+    SmartDashboard.putBoolean("1Brake MOde set?", true);
+    SmartDashboard.putNumber("1Brake angle set at: ", brake_angle);
     output_type_ = OutputType.BRAKE;
+    io_.brake_angle = brake_angle;
   }
 
   /**
@@ -253,7 +257,6 @@ public class Arm extends SubsystemBase {
   }
 
 
-
   public double getAngularVelocitySetpoint() {
     return fb_.getSetpoint().velocity;
   }
@@ -275,6 +278,7 @@ public class Arm extends SubsystemBase {
     double follower_angular_velocity;
     double current;
     double follower_velocity;
+    double brake_angle;
 
     //Outputs
     boolean wants_zero;

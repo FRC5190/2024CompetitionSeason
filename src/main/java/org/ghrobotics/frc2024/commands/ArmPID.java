@@ -49,12 +49,12 @@ public class ArmPID extends Command {
 
   @Override
   public void end(boolean interrupted) {
-    arm_.setBrake();
+    arm_.setBrake(Math.toDegrees(arm_.getAngle()));
     timer_.reset();
   }
 
   // Constants
   private static final class Constants {
-    public static final double kTolerance = 0.05; // NEED TO UPDATE
+    public static final double kTolerance = 0.5; // NEED TO UPDATE
   }
 }

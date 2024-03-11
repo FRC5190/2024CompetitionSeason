@@ -44,6 +44,7 @@ public class RobotState {
 
     SmartDashboard.putNumber("Robot Pose X", getPosition().getTranslation().getX());
     SmartDashboard.putNumber("Robot Pose Y", getPosition().getTranslation().getY());
+    SmartDashboard.putNumber("Robot Pose Degrees", getPosition().getRotation().getDegrees());
     SmartDashboard.putNumber("Actual Robot Heading", drive_.getAngle().getDegrees());
     SmartDashboard.putNumber("Estimated Robot Heading", getDegree());
 

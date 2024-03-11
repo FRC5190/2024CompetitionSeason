@@ -86,11 +86,21 @@ public class Drive extends SubsystemBase {
   public SwerveDriveKinematics getKinematics() {
     return kinematics_;
   }
+
+  // Get Speeds
+  public ChassisSpeeds getSpeeds() {
+    return io_.speeds;
+  }
   
   // Set Speeds
   public void setSpeeds(ChassisSpeeds speeds, OutputType output_type) {
     io_.speeds = speeds;
     output_type_ = output_type;
+  }
+
+  // Set Speeds (Open Loop) Needed for auto
+  public void setsOpenSpeeds(ChassisSpeeds speeds) {
+    setSpeeds(speeds, OutputType.OPEN_LOOP);
   }
   
   // Set Speeds (Closed Loop)
