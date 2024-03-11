@@ -69,7 +69,6 @@ public class Robot extends TimedRobot {
   // Playstation controller just for testing
   // private final CommandPS4Controller ps4_controller_ = new CommandPS4Controller(0);
   // Superstructure
-  private final Superstructure superstructure_ = new Superstructure(arm_, intake_, shooter_, feeder_);
   private final Superstructure superstructure_ = new Superstructure(arm_, intake_, shooter_, feeder_, limelight_);
   private final AutoSelector auto_selector_= new AutoSelector(drive_, robot_state_, superstructure_, arm_, intake_, shooter_, feeder_);
 
