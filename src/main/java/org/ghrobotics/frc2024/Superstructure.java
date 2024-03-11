@@ -46,9 +46,11 @@ public class Superstructure {
     SmartDashboard.putNumber("Arm Angle", Math.toDegrees(arm_.getAngle()));
 
     // Checks output current to see if note has intaked or not (current > 40 means intaked)
-    if (intake_.getLeftOutputCurrent() > 40) {
-      LimelightHelpers.setLEDMode_ForceBlink(limelight_.getName());
+    if (intake_.getLeftOutputCurrent() > 35) {
+      LimelightHelpers.setLEDMode_ForceOn("limelight");
     }
+
+    SmartDashboard.putBoolean("Should be blinking", intake_.getLeftOutputCurrent() > 40);
   }
 
   // Position Setter

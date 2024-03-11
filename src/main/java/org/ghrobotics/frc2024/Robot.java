@@ -23,6 +23,7 @@ import org.ghrobotics.frc2024.Superstructure.Position;
 import org.ghrobotics.frc2024.auto.AutoSelector;
 import org.ghrobotics.frc2024.commands.ArmPID;
 import org.ghrobotics.frc2024.commands.DriveTeleop;
+import org.ghrobotics.frc2024.commands.RotateToSpeaker;
 import org.ghrobotics.frc2024.subsystems.Arm;
 // import org.ghrobotics.frc2024.subsystems.Climber;
 import org.ghrobotics.frc2024.subsystems.Drive;
@@ -199,6 +200,8 @@ public class Robot extends TimedRobot {
     driver_controller_.b().whileTrue(superstructure_.shoot());
 
     driver_controller_.a().whileTrue(superstructure_.setFeeder(0.5));
+
+    // driver_controller_.pov(90).onTrue(new RotateToSpeaker(drive_, robot_state_));
 
     // driver_controller_.a().whileTrue(superstructure_.setFeeder(0.5));
 

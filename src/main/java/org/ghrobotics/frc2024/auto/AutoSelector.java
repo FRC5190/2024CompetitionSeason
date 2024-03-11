@@ -91,13 +91,12 @@ public class AutoSelector {
       ),
       new WaitCommand(1.0),
       new ParallelCommandGroup(
-        new ArmPID(arm_, 2),
         new InstantCommand(() -> intake_.stopMotor()),
         new InstantCommand(() -> feeder_.stopMotor()),
         new InstantCommand(() -> shooter_.stopMotor())
       ),
-      new WaitCommand(0.1),
       new ParallelCommandGroup(
+        new ArmPID(arm_, 2),
         new InstantCommand(() -> intake_.setPercent(-0.25)),
         AutoBuilder.followPath(middle_middle_intake_path)
       ),

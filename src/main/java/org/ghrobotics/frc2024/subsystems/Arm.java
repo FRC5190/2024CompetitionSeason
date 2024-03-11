@@ -207,7 +207,7 @@ public class Arm extends SubsystemBase {
   public void setAnglePID(double angle) {
     pid_.setSetpoint(angle);
     // SmartDashboard.putNumber("Angle Calculate", pid_.calculate(Math.toDegrees(getAngle())));
-    double output = MathUtil.clamp(pid_.calculate(Math.toDegrees(getAngle())), -0.2, 0.50);
+    double output = MathUtil.clamp(pid_.calculate(Math.toDegrees(getAngle())), -0.3, 0.60);
     SmartDashboard.putNumber("Arm output", output);
 
     if (Math.abs(output) < 0.01){

@@ -8,6 +8,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class SwerveModule {
   // Swerve Module Configuration
@@ -138,6 +139,8 @@ public class SwerveModule {
     // Set drive output
     switch (output_type) {
       case OPEN_LOOP:
+        SmartDashboard.putNumber("11Drive Motor Set Speed", state.speedMetersPerSecond / Constants.kMaxModuleSpeed);
+        SmartDashboard.putNumber("11max speed", state.speedMetersPerSecond);
         drive_motor_.set(state.speedMetersPerSecond / Constants.kMaxModuleSpeed);
         break;
       case VELOCITY:
@@ -168,6 +171,7 @@ public class SwerveModule {
     public static final double kDriveGearRatio = 8.14;
     public static final double kSteerGearRatio = 150.0 / 7;
     public static final double kWheelRadius = 0.0508;
-    public static final double kMaxModuleSpeed = 3.66;
+    // Setting it any lower can increase sensitivity but not increase speed
+    public static final double kMaxModuleSpeed = 1.0;
   }
 }
