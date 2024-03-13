@@ -9,17 +9,9 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
-import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
 // import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
-
-import org.ghrobotics.frc2024.Superstructure.Position;
 import org.ghrobotics.frc2024.auto.AutoSelector;
 import org.ghrobotics.frc2024.commands.ArmPID;
 import org.ghrobotics.frc2024.commands.DriveTeleop;
@@ -42,15 +34,14 @@ public class Robot extends TimedRobot {
   // Subsystems
   private final Drive drive_ = new Drive();
   private final Arm arm_ = new Arm();
-  // private final Climber climber_ = new Climber();
   private final Intake intake_ = new Intake();
   private final Shooter shooter_ = new Shooter();
   private final Feeder feeder_ = new Feeder();
   private final Limelight limelight_ = new Limelight("limelight");
 
   private final Field2d field_ = new Field2d();
-  
-  // private final ArmPID arm_command = new ArmPID();
+
+  private boolean isAuto = false;
 
   // Robot State
   private final RobotState robot_state_ = new RobotState(drive_, limelight_);
@@ -64,21 +55,10 @@ public class Robot extends TimedRobot {
   private final CommandXboxController driver_controller_ = new CommandXboxController(0);
   private final CommandXboxController operator_controller_ = new CommandXboxController(1);
 
-
-  // Trigger hold_position = operator_controller_.rightTrigger(0.2);
-
-  // Playstation controller just for testing
-  // private final CommandPS4Controller ps4_controller_ = new CommandPS4Controller(0);
   // Superstructure
   private final Superstructure superstructure_ = new Superstructure(arm_, intake_, shooter_, feeder_, limelight_);
   private final AutoSelector auto_selector_= new AutoSelector(drive_, robot_state_, superstructure_, arm_, intake_, shooter_, feeder_);
 
-  public Command test() {
-    return new SequentialCommandGroup(
-      superstructure_.setPosition(Position.STOW),
-      new WaitCommand(3.0)
-    );
-  }
   @Override
   public void robotInit() {
     drive_.setDefaultCommand(new DriveTeleop(drive_, robot_state_, driver_controller_));
@@ -96,11 +76,8 @@ public class Robot extends TimedRobot {
     superstructure_.periodic();
     telemetry_.periodic();
     robot_state_.update();
+    SmartDashboard.putBoolean("Auto", isAuto);
 
-    // SmartDashboard.putNumber("Leader Encoder angle deg", Math.toDegrees(arm_.getLeaderAngle()));
-    // SmartDashboard.putNumber("Follower Encoder angle deg", Math.toDegrees(arm_.getFollowerAngle()));
-    // SmartDashboard.putNumber("leader velocity", arm_.getAngularVelocity());
-    // SmartDashboard.putNumber("Follower Velocity", arm_.getFollowerAngularVelocity());
     SmartDashboard.putNumber("Robot Angle", drive_.getAngle().getDegrees());
 
     SmartDashboard.putNumber("estimated angle", robot_state_.getDegree());
@@ -109,16 +86,14 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Vision y", limelight_.getBotPose2d().getY());
     SmartDashboard.putNumber("Vision Degrees", limelight_.getBotPose2d().getRotation().getDegrees());
 
-    SmartDashboard.putNumber("Odometry x", robot_state_.getPosition().getX());
-    SmartDashboard.putNumber("Odometry y", robot_state_.getPosition().getY());
-    SmartDashboard.putNumber("Odometry Degrees", robot_state_.getPosition().getRotation().getDegrees());
-
     field_.setRobotPose(limelight_.getBotPose2d());
   }
 
 
   @Override
   public void autonomousInit() {
+    isAuto = true;
+
     robot_state_.reset(new Pose2d(
       auto_selector_.getStartingPose().getX(), 
       auto_selector_.getStartingPose().getY(), 
@@ -132,21 +107,17 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousPeriodic() {}
   
-  // Might need this in the future
-  // robot_state_.reset(robot_state_.getPosition());
-  // robot_state_.update();
+
   @Override
   public void teleopInit() {
+    isAuto = false;
     robot_state_.reset(limelight_.getBotPose2d());
     drive_.setBrakeMode(true);
     arm_.setBrakeMode(true);
-
-    // test().schedule();
   }
   
   @Override
   public void teleopPeriodic() {
-    robot_state_.update();
     if (Math.toDegrees(arm_.getAngle()) < 15 && Math.toDegrees(arm_.getAngle()) > 0) {
       brake_value_ = 0.05;
     }

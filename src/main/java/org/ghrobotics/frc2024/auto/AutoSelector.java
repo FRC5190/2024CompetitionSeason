@@ -43,6 +43,14 @@ public class AutoSelector {
   PathPlannerPath middle_left_intake_path = PathPlannerPath.fromPathFile("middle_left_intake");
   PathPlannerPath left_shoot_path = PathPlannerPath.fromPathFile("left_shoot");
 
+  // Helper Commands
+  Command stop_all_motor;
+
+  // Four Note Auto Path
+  PathPlannerPath left_intake_path = PathPlannerPath.fromPathFile("left_intake");
+  PathPlannerPath middle_intake_path = PathPlannerPath.fromPathFile("middle_intake");
+  PathPlannerPath right_intake_path = PathPlannerPath.fromPathFile("right_intake");
+
   Trigger trigger_ = new Trigger(() -> true);
 
   public AutoSelector(Drive drive, RobotState robot_state, Superstructure superstructure, Arm arm, Intake intake, Shooter shooter, Feeder feeder) {
@@ -53,6 +61,12 @@ public class AutoSelector {
     intake_ = intake;
     shooter_ = shooter;
     feeder_ = feeder;
+
+    stop_all_motor = new ParallelCommandGroup(
+      new InstantCommand(() -> intake_.stopMotor()),
+      new InstantCommand(() -> feeder_.stopMotor()),
+      new InstantCommand(() -> shooter_.stopMotor()));
+    
 
     // Autobuilder for Pathplanner
     AutoBuilder.configureHolonomic(
@@ -75,6 +89,70 @@ public class AutoSelector {
         return false;
       },
       drive_
+    );
+  }
+
+  
+
+  public Command fourNoteAuto() {
+    return new SequentialCommandGroup(
+      new ParallelCommandGroup(
+        // Rev shooter, follow path to intake
+        new InstantCommand(() -> shooter_.setPercent(-0.75)),
+        AutoBuilder.followPath(left_intake_path),
+        new SequentialCommandGroup(
+          new ArmPID(arm_, 28),
+          new WaitCommand(0.5),
+          new InstantCommand(() -> intake_.setPercent(-0.5)),
+          new InstantCommand(() -> feeder_.setPercent(0.5)),
+          new WaitCommand(0.5),
+          new ArmPID(arm_, 2),
+          new InstantCommand(() -> intake_.setPercent(-0.5)),
+          new InstantCommand(() -> feeder_.stopMotor())
+        )
+      ),
+      new ParallelCommandGroup(
+        // Rev shooter, follow path to shoot
+        // new InstantCommand(() -> shooter_.setPercent(-0.75)),
+        AutoBuilder.followPath(middle_intake_path),
+        new SequentialCommandGroup(
+          new ArmPID(arm_, 26),
+          new WaitCommand(0.5),
+          new InstantCommand(() -> intake_.setPercent(-0.5)),
+          new InstantCommand(() -> feeder_.setPercent(0.5)),
+          new WaitCommand(0.5),
+          new ArmPID(arm_, 2),
+          new InstantCommand(() -> intake_.setPercent(-0.5)),
+          new InstantCommand(() -> feeder_.stopMotor())
+        )
+      ),
+      new ArmPID(arm_, 30),
+      new InstantCommand(() -> feeder_.setPercent(0.5)),
+      new WaitCommand(0.5),
+      new ParallelCommandGroup(
+        new InstantCommand(() -> feeder_.stopMotor()),
+        new InstantCommand(() -> intake_.setPercent(-0.75))
+      )
+    );
+  }
+
+  public Command shootMove() {
+    return new SequentialCommandGroup(
+      new ParallelCommandGroup(
+        // Rev shooter, follow path to intake
+        new InstantCommand(() -> shooter_.setPercent(-0.75)),
+        AutoBuilder.followPath(middle_intake_path),
+        new SequentialCommandGroup(
+          new ArmPID(arm_, 28),
+          new WaitCommand(0.5),
+          new InstantCommand(() -> intake_.setPercent(-0.5)),
+          new InstantCommand(() -> feeder_.setPercent(0.5)),
+          new WaitCommand(0.5),
+          new ArmPID(arm_, 2),
+          new InstantCommand(() -> intake_.setPercent(-0.5)),
+          new InstantCommand(() -> feeder_.stopMotor())
+        )
+      )
     );
   }
 
