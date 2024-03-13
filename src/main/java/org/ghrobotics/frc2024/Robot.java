@@ -201,7 +201,7 @@ public class Robot extends TimedRobot {
 
     driver_controller_.a().whileTrue(superstructure_.setFeeder(0.5));
 
-    // driver_controller_.pov(90).onTrue(new RotateToSpeaker(drive_, robot_state_));
+    driver_controller_.pov(90).onTrue(new RotateToSpeaker(drive_, robot_state_, limelight_));
 
     // driver_controller_.a().whileTrue(superstructure_.setFeeder(0.5));
 
