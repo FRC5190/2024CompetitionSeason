@@ -98,7 +98,7 @@ public class Robot extends TimedRobot {
       auto_selector_.getStartingPose().getX(), 
       auto_selector_.getStartingPose().getY(), 
       Rotation2d.fromDegrees(0)));
-    auto_selector_.followPath().schedule();
+    auto_selector_.fourNoteFull().schedule();
 
     drive_.setBrakeMode(true);
     arm_.setBrakeMode(true);
