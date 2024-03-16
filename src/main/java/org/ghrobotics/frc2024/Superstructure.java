@@ -1,5 +1,7 @@
 package org.ghrobotics.frc2024;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -26,24 +28,37 @@ public class Superstructure {
   private final Shooter shooter_;
   private final Feeder feeder_;
   private final Limelight limelight_;
+  private final RobotState robot_state_;
+  private final ShootingPosition shootingPosition_ = new ShootingPosition();
+  
 
   //Store Position
   public String state = "STOW";
 
+  // Shooting Angle
+  public double armShootingAngle;
+  public double shootingDistance;
+
   // Constructor
-  public Superstructure(Arm arm, Intake intake, Shooter shooter, Feeder feeder, Limelight limelight) {
+  public Superstructure(Arm arm, Intake intake, Shooter shooter, Feeder feeder, Limelight limelight, RobotState robot_state) {
     arm_ = arm;
     // climber_ = climber;
     intake_ = intake;
     shooter_ = shooter;
     feeder_ = feeder;
     limelight_ = limelight;
+    robot_state_ = robot_state;
   }
 
   public void periodic() {
+    shootingDistance = shootingPosition_.distanceToSpeaker(robot_state_.getPosition(), ShootingPosition.Constatnts.redSubwooferPose);
+    armShootingAngle = shootingPosition_.regressionFormula(shootingDistance);
+
     SmartDashboard.putNumber("Shooter Percent", shooter_.getPercent());
     // SmartDashboard.putNumber("Intake Percent", intake_.getPercent());
     SmartDashboard.putNumber("Arm Angle", Math.toDegrees(arm_.getAngle()));
+
+    SmartDashboard.putNumber("Shooting Angle", armShootingAngle);
 
     // Checks output current to see if note has intaked or not (current > 40 means intaked)
     if (intake_.getLeftOutputCurrent() > 35) {
@@ -58,7 +73,7 @@ public class Superstructure {
     return new SequentialCommandGroup(
       new InstantCommand(() -> this.state = pos.posname),
       new ParallelCommandGroup(
-        new ArmToPosition(arm_, pos.angle)
+        new ArmPID(arm_, pos.angle)
       ).withTimeout(2)
     );
   }
@@ -99,6 +114,18 @@ public class Superstructure {
 
   public Command shoot() {
     return Commands.parallel(setIntake(-0.6), setShooter(-0.75));
+  }
+
+  /**
+   * Keep arm at shooting angle
+   * @param angle_deg angle in degrees
+   */
+  public Command autoArm(double angle_deg) {
+    return new StartEndCommand(
+      () -> arm_.setAnglePID(Math.toRadians(angle_deg)),
+      () -> new ArmPID(arm_, 2),
+      arm_
+    );
   }
 
   /**

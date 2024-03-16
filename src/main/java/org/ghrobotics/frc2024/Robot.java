@@ -56,7 +56,7 @@ public class Robot extends TimedRobot {
   private final CommandXboxController operator_controller_ = new CommandXboxController(1);
 
   // Superstructure
-  private final Superstructure superstructure_ = new Superstructure(arm_, intake_, shooter_, feeder_, limelight_);
+  private final Superstructure superstructure_ = new Superstructure(arm_, intake_, shooter_, feeder_, limelight_, robot_state_);
   private final AutoSelector auto_selector_= new AutoSelector(drive_, robot_state_, superstructure_, arm_, intake_, shooter_, feeder_);
 
   @Override
@@ -118,6 +118,9 @@ public class Robot extends TimedRobot {
   
   @Override
   public void teleopPeriodic() {
+
+
+
     if (Math.toDegrees(arm_.getAngle()) < 15 && Math.toDegrees(arm_.getAngle()) > 0) {
       brake_value_ = 0.05;
     }
@@ -173,6 +176,11 @@ public class Robot extends TimedRobot {
     driver_controller_.a().whileTrue(superstructure_.setFeeder(0.5));
 
     driver_controller_.pov(90).onTrue(new RotateToSpeaker(drive_, robot_state_, limelight_));
+    
+    // Useful for shooting while moving
+    driver_controller_.pov(270).whileTrue(
+      superstructure_.autoArm(SmartDashboard.getNumber("Shooting Angle", 2)));
+
 
     // driver_controller_.a().whileTrue(superstructure_.setFeeder(0.5));
 
@@ -192,5 +200,13 @@ public class Robot extends TimedRobot {
     operator_controller_.pov(0).whileTrue(superstructure_.setArmPercent(0.1));
     
     operator_controller_.pov(180).whileTrue(superstructure_.setArmPercent(-0.1));
+  }
+
+  public class Constatnts {
+    // Red Subwoofer Pose 2d
+    public static Pose2d redSubwooferPose = new Pose2d(16.5, 5.57, new Rotation2d(0));
+
+    // Blue Subwoofer Pose 2d
+    public static Pose2d blueSubwooferPose = new Pose2d(0.05, 5.57, new Rotation2d(0));
   }
 }
