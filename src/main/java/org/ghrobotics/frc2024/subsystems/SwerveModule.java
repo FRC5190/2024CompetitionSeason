@@ -140,8 +140,8 @@ public class SwerveModule {
     // Set drive output
     switch (output_type) {
       case OPEN_LOOP:
-        SmartDashboard.putNumber("11Drive Motor Set Speed", state.speedMetersPerSecond / Constants.kMaxModuleSpeed);
-        SmartDashboard.putNumber("11max speed", state.speedMetersPerSecond);
+        // SmartDashboard.putNumber("11Drive Motor Set Speed", state.speedMetersPerSecond / Constants.kMaxModuleSpeed);
+        // SmartDashboard.putNumber("11max speed", state.speedMetersPerSecond);
         if(SmartDashboard.getBoolean("Auto", false)) {
           drive_motor_.set(state.speedMetersPerSecond / Constants.kMaxAutoSpeed);
         } else {

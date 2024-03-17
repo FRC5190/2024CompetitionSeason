@@ -54,8 +54,8 @@ public class Intake extends SubsystemBase {
   // }
 
   public void setPercent(double value) {
-    io_.left_demand = value;
-    io_.right_demand = value - 0.1;
+    io_.left_demand = value + 0.2;
+    io_.right_demand = value;
   }
   public void stopMotor() {
     io_.left_demand = 0;

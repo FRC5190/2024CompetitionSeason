@@ -66,7 +66,9 @@ public class Robot extends TimedRobot {
     SmartDashboard.putData("field", field_);
     setupTeleopControls();
     // drive_.setBrakeMode(true);
-    robot_state_.reset(auto_selector_.getStartingPose());
+    // robot_state_.reset(auto_selector_.getStartingPose());
+
+    robot_state_.reset(new Pose2d(1.363, 5.517, Rotation2d.fromDegrees(0)));
   }
   
   @Override
@@ -86,7 +88,7 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Vision y", limelight_.getBotPose2d().getY());
     SmartDashboard.putNumber("Vision Degrees", limelight_.getBotPose2d().getRotation().getDegrees());
 
-    field_.setRobotPose(limelight_.getBotPose2d());
+    field_.setRobotPose(robot_state_.getPosition());
   }
 
 
@@ -111,7 +113,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopInit() {
     isAuto = false;
-    robot_state_.reset(limelight_.getBotPose2d());
+    // robot_state_.reset(limelight_.getBotPose2d());
     drive_.setBrakeMode(true);
     arm_.setBrakeMode(true);
   }
@@ -159,13 +161,17 @@ public class Robot extends TimedRobot {
   private void setupTeleopControls() {
 
     // Driver Control
-    driver_controller_.rightTrigger().whileTrue(superstructure_.setShooter(-0.75));
+    driver_controller_.rightTrigger().whileTrue(superstructure_.setShooter(0.75));
 
-    driver_controller_.rightBumper().whileTrue(superstructure_.setShooter(-0.5));
+    driver_controller_.rightBumper().whileTrue(superstructure_.setShooter(0.65));
 
-    driver_controller_.leftTrigger().whileTrue(superstructure_.setIntake(-0.25));
+    driver_controller_.pov(180).whileTrue(superstructure_.setShooter(0.55));
 
-    driver_controller_.leftBumper().whileTrue(superstructure_.setIntake(0.15));
+    driver_controller_.pov(270).whileTrue(superstructure_.setShooter(85));
+
+    driver_controller_.leftTrigger().whileTrue(superstructure_.setIntake(0.25));
+
+    driver_controller_.leftBumper().whileTrue(superstructure_.setIntake(-0.15));
 
     driver_controller_.pov(0).whileTrue(superstructure_.setArmPercent(0.056));
 
@@ -173,9 +179,9 @@ public class Robot extends TimedRobot {
 
     driver_controller_.b().whileTrue(superstructure_.shoot());
 
-    driver_controller_.a().whileTrue(superstructure_.setFeeder(0.5));
+    driver_controller_.a().whileTrue(superstructure_.setFeeder(0.85));
 
-    driver_controller_.pov(90).onTrue(new RotateToSpeaker(drive_, robot_state_, limelight_));
+    driver_controller_.pov(90).whileTrue(superstructure_.setShooter(90));
     
     // Useful for shooting while moving
     driver_controller_.pov(270).whileTrue(
@@ -189,13 +195,13 @@ public class Robot extends TimedRobot {
 
     operator_controller_.leftTrigger().whileTrue(superstructure_.setArmPercent(brake_value_));
 
-    operator_controller_.b().onTrue(new ArmPID(arm_, 20));
+    operator_controller_.b().onTrue(new ArmPID(arm_, 16.5));
 
     operator_controller_.a().onTrue(new ArmPID(arm_, 2));
 
-    operator_controller_.y().onTrue(new ArmPID(arm_, 36));
+    operator_controller_.y().onTrue(new ArmPID(arm_, 25));
 
-    operator_controller_.x().onTrue(new ArmPID(arm_, 60));
+    operator_controller_.x().onTrue(new ArmPID(arm_, 55));
 
     operator_controller_.pov(0).whileTrue(superstructure_.setArmPercent(0.1));
     
