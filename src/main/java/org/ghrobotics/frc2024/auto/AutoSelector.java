@@ -1,7 +1,5 @@
 package org.ghrobotics.frc2024.auto;
 
-import java.nio.file.Path;
-
 import org.ghrobotics.frc2024.RobotState;
 import org.ghrobotics.frc2024.Superstructure;
 import org.ghrobotics.frc2024.commands.ArmPID;

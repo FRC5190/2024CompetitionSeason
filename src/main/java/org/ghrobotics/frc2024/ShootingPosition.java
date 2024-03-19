@@ -31,9 +31,9 @@ public class ShootingPosition {
 
   public class Constants {
     // Red Subwoofer Pose 2d
-    public static Pose2d redSubwooferPose = new Pose2d(16.5, 5.57, new Rotation2d(0));
+    public static Pose2d kRedSubwooferPose = new Pose2d(16.5, 5.57, new Rotation2d(0));
 
     // Blue Subwoofer Pose 2d
-    public static Pose2d blueSubwooferPose = new Pose2d(0.05, 5.57, new Rotation2d(0));
+    public static Pose2d kBlueSubwooferPose = new Pose2d(0.05, 5.57, new Rotation2d(0));
   }
 }

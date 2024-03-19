@@ -16,7 +16,12 @@ public class ArmPID extends Command {
   private final Timer timer_ = new Timer();
 
   private double something;
-  // Constructor
+
+  /**
+   * Moves Arm to desired angle
+   * @param arm
+   * @param position Desired angle in degrees
+   */
   public ArmPID(Arm arm, double position) {
     // Assign member variables
     arm_ = arm;
@@ -44,7 +49,6 @@ public class ArmPID extends Command {
     SmartDashboard.putBoolean("Finished", Math.abs(Math.toDegrees(arm_.getAngle()) - position_) < Constants.kTolerance);
     SmartDashboard.putNumber("Finished get angle", Math.abs(arm_.getAngle()));
     return Math.abs(Math.toDegrees(arm_.getAngle()) - position_) < Constants.kTolerance;
-    // return timer_.hasElapsed(0.5);
   }
 
   @Override
