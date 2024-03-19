@@ -16,7 +16,7 @@ public class ShootingPosition {
    * @return Arm Angle to speaker
    */
   public double regressionFormula(double x) {
-    double y = (2 * x) + 1;
+    double y = (10.0286 * Math.log((9.48057 * x) - 8.57204)) + 8.226559;
 
     return y;
   }
@@ -29,7 +29,7 @@ public class ShootingPosition {
   //   return angle;
   // }
 
-  public class Constatnts {
+  public class Constants {
     // Red Subwoofer Pose 2d
     public static Pose2d redSubwooferPose = new Pose2d(16.5, 5.57, new Rotation2d(0));
 

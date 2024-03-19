@@ -177,14 +177,14 @@ public class Robot extends TimedRobot {
 
     // driver_controller_.pov(180).whileTrue(superstructure_.setShooter(0.3));
 
-    driver_controller_.b().whileTrue(superstructure_.shoot());
+    // driver_controller_.b().whileTrue(superstructure_.shoot());
 
     driver_controller_.a().whileTrue(superstructure_.setFeeder(0.85));
 
     driver_controller_.pov(90).whileTrue(superstructure_.setShooter(90));
     
     // Useful for shooting while moving
-    driver_controller_.pov(270).whileTrue(
+    driver_controller_.b().whileTrue(
       superstructure_.autoArm(SmartDashboard.getNumber("Shooting Angle", 2)));
 
 
