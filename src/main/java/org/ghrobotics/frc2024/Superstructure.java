@@ -47,6 +47,8 @@ public class Superstructure {
 
     SmartDashboard.putNumber("Shooting Angle", armShootingAngle);
 
+    SmartDashboard.putString("Superstructure State", state);
+
     // Checks output current to see if note has intaked or not (current > 35 means intaked)
     if (intake_.getLeftOutputCurrent() > 35) {
       LimelightHelpers.setLEDMode_ForceOn("limelight");
@@ -59,7 +61,7 @@ public class Superstructure {
       new InstantCommand(() -> this.state = pos.posname),
       new ParallelCommandGroup(
         new ArmPID(arm_, pos.angle)
-      ).withTimeout(2)
+      ).withTimeout(3.5)
     );
   }
 

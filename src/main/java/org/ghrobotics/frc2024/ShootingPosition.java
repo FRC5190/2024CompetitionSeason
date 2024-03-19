@@ -18,6 +18,12 @@ public class ShootingPosition {
   public double regressionFormula(double x) {
     double y = (10.0286 * Math.log((9.48057 * x) - 8.57204)) + 8.226559;
 
+    if (y > 50) {
+      y = 2;
+    } else if (y < 0) {
+      y = 2;
+    }
+    
     return y;
   }
 

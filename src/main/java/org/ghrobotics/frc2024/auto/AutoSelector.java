@@ -17,6 +17,7 @@ import com.pathplanner.lib.util.ReplanningConfig;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -33,6 +34,9 @@ public class AutoSelector {
   private final Intake intake_;
   private final Shooter shooter_;
   private final Feeder feeder_;
+
+  // Sendable chooser
+  private final SendableChooser<Command> routine_chooser_;
 
   // Different Paths
   PathPlannerPath middle_middle_intake_path = PathPlannerPath.fromPathFile("middle_middle_intake");
@@ -59,6 +63,9 @@ public class AutoSelector {
     intake_ = intake;
     shooter_ = shooter;
     feeder_ = feeder;
+
+    routine_chooser_ = AutoBuilder.buildAutoChooser();
+    routine_chooser_.setDefaultOption("Four Note Auto", fourNoteFull());
 
     stop_all_motor = new ParallelCommandGroup(
       new InstantCommand(() -> intake_.stopMotor()),
@@ -88,6 +95,10 @@ public class AutoSelector {
       },
       drive_
     );
+  }
+
+  public Command getSelectedRoutine() {
+    return routine_chooser_.getSelected();
   }
 
   public Command fourNoteFull() {

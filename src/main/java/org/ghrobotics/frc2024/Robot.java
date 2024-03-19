@@ -168,7 +168,7 @@ public class Robot extends TimedRobot {
 
     operator_controller_.a().onTrue(new ArmPID(arm_, 2));
 
-    operator_controller_.y().onTrue(new ArmPID(arm_, 25));
+    operator_controller_.y().onTrue(superstructure_.setPosition(Superstructure.Position.SUBWOOFER));
 
     operator_controller_.x().onTrue(new ArmPID(arm_, 55));
 
