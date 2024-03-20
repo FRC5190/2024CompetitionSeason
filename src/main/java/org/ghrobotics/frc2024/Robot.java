@@ -54,7 +54,7 @@ public class Robot extends TimedRobot {
 
   // Superstructure
   private final Superstructure superstructure_ = new Superstructure(arm_, intake_, shooter_, feeder_, robot_state_);
-  // private final AutoSelector auto_selector_= new AutoSelector(drive_, robot_state_, superstructure_, arm_, intake_, shooter_, feeder_);
+  private final AutoSelector auto_selector_= new AutoSelector(drive_, robot_state_, superstructure_, arm_, intake_, shooter_, feeder_);
 
   @Override
   public void robotInit() {
@@ -87,11 +87,11 @@ public class Robot extends TimedRobot {
   public void autonomousInit() {
     isAuto = true;
 
-    // robot_state_.reset(new Pose2d(
-    //   auto_selector_.getStartingPose().getX(), 
-    //   auto_selector_.getStartingPose().getY(), 
-    //   Rotation2d.fromDegrees(0)));
-    // auto_selector_.fourNoteFull().schedule();
+    robot_state_.reset(new Pose2d(
+      auto_selector_.getStartingPose().getX(), 
+      auto_selector_.getStartingPose().getY(), 
+      Rotation2d.fromDegrees(0)));
+    auto_selector_.fourNoteFull().schedule();
 
     drive_.setBrakeMode(true);
     arm_.setBrakeMode(true);

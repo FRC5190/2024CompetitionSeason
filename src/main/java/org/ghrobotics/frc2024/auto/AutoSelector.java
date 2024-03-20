@@ -53,6 +53,8 @@ public class AutoSelector {
   PathPlannerPath middle_intake_path = PathPlannerPath.fromPathFile("middle_intake");
   PathPlannerPath right_intake_path = PathPlannerPath.fromPathFile("right_intake");
 
+  PathPlannerPath left_one_intake_path = PathPlannerPath.fromPathFile("left_one_intake");
+
   Trigger trigger_ = new Trigger(() -> true);
 
   public AutoSelector(Drive drive, RobotState robot_state, Superstructure superstructure, Arm arm, Intake intake, Shooter shooter, Feeder feeder) {

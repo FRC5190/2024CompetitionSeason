@@ -1,6 +1,8 @@
 package org.ghrobotics.frc2024.subsystems;
 
 import org.ghrobotics.frc2024.CANCoderSwerve;
+import org.ghrobotics.frc2024.Robot;
+
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkBase.IdleMode;
@@ -109,7 +111,8 @@ public class SwerveModule {
   // Reset Encoders
   public void resetEncoders() {
     drive_encoder_.setPosition(0);
-    steer_encoder_.setPosition(Math.toRadians(getCANCoderDeg()));
+    if (!Robot.isSimulation())
+      steer_encoder_.setPosition(Math.toRadians(getCANCoderDeg()));
   }
   
   /**
