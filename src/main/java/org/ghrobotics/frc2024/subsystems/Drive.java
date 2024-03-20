@@ -60,10 +60,10 @@ public class Drive extends SubsystemBase {
     for (int i = 0; i < modules_.length; i++) {
       modules_[i].setDesiredState(module_states[i], output_type_);
       
-      SmartDashboard.putNumber(String.format("Module [%d] Speed", i),
-        modules_[i].getDriveVelocity());
-      SmartDashboard.putNumber(String.format("Module [%d] Angle", i),
-        modules_[i].getSteerPosition().getDegrees());
+      // SmartDashboard.putNumber(String.format("Module [%d] Speed", i),
+      //   modules_[i].getDriveVelocity());
+      // SmartDashboard.putNumber(String.format("Module [%d] Angle", i),
+      //   modules_[i].getSteerPosition().getDegrees());
     }
   }
   

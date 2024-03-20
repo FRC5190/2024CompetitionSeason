@@ -4,30 +4,22 @@
 
 package org.ghrobotics.frc2024;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
-import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
-// import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
-
-import org.ghrobotics.frc2024.Superstructure.Position;
-import org.ghrobotics.frc2024.auto.AutoSelector;
 import org.ghrobotics.frc2024.commands.ArmPID;
 import org.ghrobotics.frc2024.commands.DriveTeleop;
 import org.ghrobotics.frc2024.subsystems.Arm;
-// import org.ghrobotics.frc2024.subsystems.Climber;
 import org.ghrobotics.frc2024.subsystems.Drive;
 import org.ghrobotics.frc2024.subsystems.Feeder;
 import org.ghrobotics.frc2024.subsystems.Intake;
+import org.ghrobotics.frc2024.subsystems.Limelight;
 import org.ghrobotics.frc2024.subsystems.Shooter;
+
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 /**
 * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -39,17 +31,17 @@ public class Robot extends TimedRobot {
   // Subsystems
   private final Drive drive_ = new Drive();
   private final Arm arm_ = new Arm();
-  // private final Climber climber_ = new Climber();
   private final Intake intake_ = new Intake();
   private final Shooter shooter_ = new Shooter();
   private final Feeder feeder_ = new Feeder();
+  private final Limelight limelight_ = new Limelight("limelight");
 
-  
-  
-  // private final ArmPID arm_command = new ArmPID();
+  private final Field2d field_ = new Field2d();
+
+  private boolean isAuto;
 
   // Robot State
-  private final RobotState robot_state_ = new RobotState(drive_);
+  private final RobotState robot_state_ = new RobotState(drive_, limelight_);
 
   // Telemetry
   private final Telemetry telemetry_ = new Telemetry(robot_state_, arm_);
@@ -60,28 +52,19 @@ public class Robot extends TimedRobot {
   private final CommandXboxController driver_controller_ = new CommandXboxController(0);
   private final CommandXboxController operator_controller_ = new CommandXboxController(1);
 
-
-  // Trigger hold_position = operator_controller_.rightTrigger(0.2);
-
-  // Playstation controller just for testing
-  // private final CommandPS4Controller ps4_controller_ = new CommandPS4Controller(0);
   // Superstructure
-  private final Superstructure superstructure_ = new Superstructure(arm_, intake_, shooter_, feeder_);
-  private final AutoSelector auto_selector_= new AutoSelector(drive_, robot_state_, superstructure_, arm_, intake_, shooter_, feeder_);
+  private final Superstructure superstructure_ = new Superstructure(arm_, intake_, shooter_, feeder_, robot_state_);
+  // private final AutoSelector auto_selector_= new AutoSelector(drive_, robot_state_, superstructure_, arm_, intake_, shooter_, feeder_);
 
-  public Command test() {
-    return new SequentialCommandGroup(
-      superstructure_.setPosition(Position.STOW),
-      new WaitCommand(3.0)
-    );
-  }
   @Override
   public void robotInit() {
     drive_.setDefaultCommand(new DriveTeleop(drive_, robot_state_, driver_controller_));
 
+    SmartDashboard.putData("field", field_);
     setupTeleopControls();
-    drive_.setBrakeMode(true);
-    robot_state_.reset(auto_selector_.getStartingPose());
+
+    // Just to test the blue subwoofer distance
+    robot_state_.reset(new Pose2d(1.363, 5.517, Rotation2d.fromDegrees(0)));
   }
   
   @Override
@@ -90,66 +73,49 @@ public class Robot extends TimedRobot {
 
     superstructure_.periodic();
     telemetry_.periodic();
-
-    // SmartDashboard.putNumber("Leader Encoder angle deg", Math.toDegrees(arm_.getLeaderAngle()));
-    // SmartDashboard.putNumber("Follower Encoder angle deg", Math.toDegrees(arm_.getFollowerAngle()));
-    // SmartDashboard.putNumber("leader velocity", arm_.getAngularVelocity());
-    // SmartDashboard.putNumber("Follower Velocity", arm_.getFollowerAngularVelocity());
-    SmartDashboard.putNumber("Robot Angle", drive_.getAngle().getDegrees());
-
-    SmartDashboard.putNumber("estimated angle", robot_state_.getDegree());
-    // SmartDashboard.putNumber("estimated x", robot_state_.getPosition().getX());
-    // SmartDashboard.putNumber("estimated y", robot_state_.getPosition().getY());
     robot_state_.update();
+
+    SmartDashboard.putNumber("Vision x", limelight_.getBotPose2d().getX());
+    SmartDashboard.putNumber("Vision y", limelight_.getBotPose2d().getY());
+    SmartDashboard.putNumber("Vision Degrees", limelight_.getBotPose2d().getRotation().getDegrees());
+
+    field_.setRobotPose(robot_state_.getPosition());
   }
 
 
   @Override
   public void autonomousInit() {
-    robot_state_.reset(new Pose2d(
-      auto_selector_.getStartingPose().getX(), 
-      auto_selector_.getStartingPose().getY(), 
-      Rotation2d.fromDegrees(0)));
-    auto_selector_.followPath().schedule();
+    isAuto = true;
 
-    // drive_.setBrakeMode(true);
+    // robot_state_.reset(new Pose2d(
+    //   auto_selector_.getStartingPose().getX(), 
+    //   auto_selector_.getStartingPose().getY(), 
+    //   Rotation2d.fromDegrees(0)));
+    // auto_selector_.fourNoteFull().schedule();
+
+    drive_.setBrakeMode(true);
     arm_.setBrakeMode(true);
   }
   
   @Override
   public void autonomousPeriodic() {}
   
-  // Might need this in the future
-  // robot_state_.reset(robot_state_.getPosition());
-  // robot_state_.update();
+
   @Override
   public void teleopInit() {
-    // drive_.setBrakeMode(true);
-    arm_.setBrakeMode(true);
+    isAuto = false;
 
-    // test().schedule();
+    drive_.setBrakeMode(true);
+    arm_.setBrakeMode(true);
   }
   
   @Override
-  public void teleopPeriodic() {
-    if (Math.toDegrees(arm_.getAngle()) < 15 && Math.toDegrees(arm_.getAngle()) > 0) {
-      brake_value_ = 0.05;
-    }
-
-    if (Math.toDegrees(arm_.getAngle()) > 15 && Math.toDegrees(arm_.getAngle()) < 40) {
-      brake_value_ = 0.05;
-    }
-
-    if (Math.toDegrees(arm_.getAngle()) > 40) {
-      brake_value_ = 0.02;
-    }
-
-  }
+  public void teleopPeriodic() {}
   
   @Override
   public void disabledInit() {
-    // drive_.setBrakeMode(false);
-    // arm_.setBrakeMode(false);
+    drive_.setBrakeMode(false);
+    arm_.setBrakeMode(false);
   }
   
   @Override
@@ -170,37 +136,52 @@ public class Robot extends TimedRobot {
   private void setupTeleopControls() {
 
     // Driver Control
-    driver_controller_.rightTrigger().whileTrue(superstructure_.setShooter(-0.75));
+    //  * RT:  Spin Shooter
+    driver_controller_.rightTrigger().whileTrue(superstructure_.setShooterPercent(0.75));
 
-    driver_controller_.rightBumper().whileTrue(superstructure_.setShooter(-0.5));
+    driver_controller_.rightBumper().whileTrue(superstructure_.setShooterPercent(0.65));
 
-    driver_controller_.leftTrigger().whileTrue(superstructure_.setIntake(-0.25));
+    // driver_controller_.pov(180).whileTrue(superstructure_.setShooter(0.55));
 
-    driver_controller_.leftBumper().whileTrue(superstructure_.setIntake(0.15));
+    // driver_controller_.pov(270).whileTrue(superstructure_.setShooter(85));
+
+    driver_controller_.leftTrigger().whileTrue(superstructure_.setIntake(0.65));
+
+    driver_controller_.leftBumper().whileTrue(superstructure_.setIntake(-0.25));
 
     driver_controller_.pov(0).whileTrue(superstructure_.setArmPercent(0.056));
 
-    // driver_controller_.pov(180).whileTrue(superstructure_.setShooter(0.3));
+    driver_controller_.a().whileTrue(superstructure_.setFeeder(0.85));
 
-    driver_controller_.b().whileTrue(superstructure_.shoot());
-
-    driver_controller_.a().whileTrue(superstructure_.setFeeder(0.5));
+    // driver_controller_.pov(90).whileTrue(superstructure_.setShooter(90));
+    
+    // Useful for shooting while moving
+    driver_controller_.b().whileTrue(
+      superstructure_.autoArm(SmartDashboard.getNumber("Shooting Angle", 2)));
 
     
     // Operator Control
 
     operator_controller_.leftTrigger().whileTrue(superstructure_.setArmPercent(brake_value_));
 
-    operator_controller_.b().onTrue(new ArmPID(arm_, 20));
+    operator_controller_.b().onTrue(superstructure_.setPosition(Superstructure.Position.SUBWOOFER));
 
-    operator_controller_.a().onTrue(new ArmPID(arm_, 2));
+    operator_controller_.a().onTrue(superstructure_.setPosition(Superstructure.Position.GROUND_INTAKE));
 
-    operator_controller_.y().onTrue(new ArmPID(arm_, 36));
+    operator_controller_.y().onTrue(superstructure_.setPosition(Superstructure.Position.SUBWOOFER));
 
-    operator_controller_.x().onTrue(new ArmPID(arm_, 60));
+    operator_controller_.x().onTrue(new ArmPID(arm_, 55));
 
-    operator_controller_.pov(0).whileTrue(superstructure_.setArmPercent(0.1));
+    operator_controller_.pov(0).whileTrue(superstructure_.setArmPercent(0.25));
     
-    operator_controller_.pov(180).whileTrue(superstructure_.setArmPercent(-0.1));
+    operator_controller_.pov(180).whileTrue(superstructure_.setArmPercent(-0.25));
+  }
+
+  public class Constatnts {
+    // Red Subwoofer Pose 2d
+    public static Pose2d redSubwooferPose = new Pose2d(16.5, 5.57, new Rotation2d(0));
+
+    // Blue Subwoofer Pose 2d
+    public static Pose2d blueSubwooferPose = new Pose2d(0.05, 5.57, new Rotation2d(0));
   }
 }
