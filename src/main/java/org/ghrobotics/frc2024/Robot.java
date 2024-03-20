@@ -4,6 +4,7 @@
 
 package org.ghrobotics.frc2024;
 
+import org.ghrobotics.frc2024.auto.AutoSelector;
 import org.ghrobotics.frc2024.commands.ArmPID;
 import org.ghrobotics.frc2024.commands.DriveTeleop;
 import org.ghrobotics.frc2024.subsystems.Arm;
