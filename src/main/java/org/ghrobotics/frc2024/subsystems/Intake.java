@@ -40,7 +40,7 @@ public class Intake extends SubsystemBase {
     SmartDashboard.putNumber("Left Intake current", io_.current_left_);
     SmartDashboard.putNumber("Right Intake current", io_.current_right_);
     leader_left_.set(io_.left_demand);
-    leader_right_.set(io_.right_demand);
+    leader_right_.set(-io_.right_demand);
   }
 
   // public double getPercent() {

@@ -64,7 +64,7 @@ public class AutoSelector {
     shooter_ = shooter;
     feeder_ = feeder;
 
-    routine_chooser_ = AutoBuilder.buildAutoChooser();
+    routine_chooser_ = new SendableChooser<Command>();
     routine_chooser_.setDefaultOption("Four Note Auto", fourNoteFull());
 
     stop_all_motor = new ParallelCommandGroup(

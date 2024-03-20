@@ -4,14 +4,6 @@
 
 package org.ghrobotics.frc2024;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import org.ghrobotics.frc2024.auto.AutoSelector;
 import org.ghrobotics.frc2024.commands.ArmPID;
 import org.ghrobotics.frc2024.commands.DriveTeleop;
 import org.ghrobotics.frc2024.subsystems.Arm;
@@ -20,6 +12,14 @@ import org.ghrobotics.frc2024.subsystems.Feeder;
 import org.ghrobotics.frc2024.subsystems.Intake;
 import org.ghrobotics.frc2024.subsystems.Limelight;
 import org.ghrobotics.frc2024.subsystems.Shooter;
+
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 /**
 * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -54,7 +54,7 @@ public class Robot extends TimedRobot {
 
   // Superstructure
   private final Superstructure superstructure_ = new Superstructure(arm_, intake_, shooter_, feeder_, robot_state_);
-  private final AutoSelector auto_selector_= new AutoSelector(drive_, robot_state_, superstructure_, arm_, intake_, shooter_, feeder_);
+  // private final AutoSelector auto_selector_= new AutoSelector(drive_, robot_state_, superstructure_, arm_, intake_, shooter_, feeder_);
 
   @Override
   public void robotInit() {
@@ -87,11 +87,11 @@ public class Robot extends TimedRobot {
   public void autonomousInit() {
     isAuto = true;
 
-    robot_state_.reset(new Pose2d(
-      auto_selector_.getStartingPose().getX(), 
-      auto_selector_.getStartingPose().getY(), 
-      Rotation2d.fromDegrees(0)));
-    auto_selector_.fourNoteFull().schedule();
+    // robot_state_.reset(new Pose2d(
+    //   auto_selector_.getStartingPose().getX(), 
+    //   auto_selector_.getStartingPose().getY(), 
+    //   Rotation2d.fromDegrees(0)));
+    // auto_selector_.fourNoteFull().schedule();
 
     drive_.setBrakeMode(true);
     arm_.setBrakeMode(true);
@@ -137,23 +137,23 @@ public class Robot extends TimedRobot {
 
     // Driver Control
     //  * RT:  Spin Shooter
-    driver_controller_.rightTrigger().whileTrue(superstructure_.setShooter(0.75));
+    driver_controller_.rightTrigger().whileTrue(superstructure_.setShooterPercent(0.75));
 
-    driver_controller_.rightBumper().whileTrue(superstructure_.setShooter(0.65));
+    driver_controller_.rightBumper().whileTrue(superstructure_.setShooterPercent(0.65));
 
-    driver_controller_.pov(180).whileTrue(superstructure_.setShooter(0.55));
+    // driver_controller_.pov(180).whileTrue(superstructure_.setShooter(0.55));
 
-    driver_controller_.pov(270).whileTrue(superstructure_.setShooter(85));
+    // driver_controller_.pov(270).whileTrue(superstructure_.setShooter(85));
 
-    driver_controller_.leftTrigger().whileTrue(superstructure_.setIntake(0.25));
+    driver_controller_.leftTrigger().whileTrue(superstructure_.setIntake(0.65));
 
-    driver_controller_.leftBumper().whileTrue(superstructure_.setIntake(-0.15));
+    driver_controller_.leftBumper().whileTrue(superstructure_.setIntake(-0.25));
 
     driver_controller_.pov(0).whileTrue(superstructure_.setArmPercent(0.056));
 
     driver_controller_.a().whileTrue(superstructure_.setFeeder(0.85));
 
-    driver_controller_.pov(90).whileTrue(superstructure_.setShooter(90));
+    // driver_controller_.pov(90).whileTrue(superstructure_.setShooter(90));
     
     // Useful for shooting while moving
     driver_controller_.b().whileTrue(
@@ -164,17 +164,17 @@ public class Robot extends TimedRobot {
 
     operator_controller_.leftTrigger().whileTrue(superstructure_.setArmPercent(brake_value_));
 
-    operator_controller_.b().onTrue(new ArmPID(arm_, 16.5));
+    operator_controller_.b().onTrue(superstructure_.setPosition(Superstructure.Position.SUBWOOFER));
 
-    operator_controller_.a().onTrue(new ArmPID(arm_, 2));
+    operator_controller_.a().onTrue(superstructure_.setPosition(Superstructure.Position.GROUND_INTAKE));
 
     operator_controller_.y().onTrue(superstructure_.setPosition(Superstructure.Position.SUBWOOFER));
 
     operator_controller_.x().onTrue(new ArmPID(arm_, 55));
 
-    operator_controller_.pov(0).whileTrue(superstructure_.setArmPercent(0.1));
+    operator_controller_.pov(0).whileTrue(superstructure_.setArmPercent(0.25));
     
-    operator_controller_.pov(180).whileTrue(superstructure_.setArmPercent(-0.1));
+    operator_controller_.pov(180).whileTrue(superstructure_.setArmPercent(-0.25));
   }
 
   public class Constatnts {

@@ -40,7 +40,8 @@ public class Superstructure {
   }
 
   public void periodic() {
-    shootingDistance = shootingPosition_.distanceToSpeaker(robot_state_.getPosition(), ShootingPosition.Constants.kRedSubwooferPose);
+    shootingDistance = shootingPosition_.distanceToSpeaker(robot_state_.getPosition(), ShootingPosition.Constants.kBlueSubwooferPose);
+    SmartDashboard.putNumber("Distance from speaker", shootingDistance);
     armShootingAngle = shootingPosition_.regressionFormula(shootingDistance);
 
     SmartDashboard.putNumber("Arm Angle", Math.toDegrees(arm_.getAngle()));
