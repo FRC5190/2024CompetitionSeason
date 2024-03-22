@@ -66,6 +66,10 @@ public class Intake extends SubsystemBase {
     return io_.current_left_;
   }
 
+  public double getRightOutputCurrent() {
+    return io_.current_right_;
+  }
+
   // IO
   public static class PeriodicIO {
     // Input

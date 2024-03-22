@@ -35,15 +35,15 @@ public class RobotState {
     // Update pose estimator with new drive measurements
     pose_estimator_.update(drive_.getAngle(), drive_.getSwerveModulePositions());
 
-    // if (limelight_.getTv() >= 1) {
-    //   pose_estimator_.setVisionMeasurementStdDevs(VecBuilder.fill(.7,.7,9999999));
-    //   pose_estimator_.addVisionMeasurement(
-    //     limelight_.getEstimatedVisionRobotPose(), 
-    //     limelight_.getProcessingLatency());
-    // }
+    // pose_estimator_.setVisionMeasurementStdDevs(VecBuilder.fill(0.01,0.01,0.01));
+    // LimelightHelpers.setLEDMode_ForceBlink("limelight");
+    // pose_estimator_.addVisionMeasurement(
+    //   limelight_.getEstimatedVisionRobotPose(), 
+    //   limelight_.getProcessingLatency());
+    
 
-    SmartDashboard.putNumber("Robot Pose X", getPosition().getTranslation().getX());
-    SmartDashboard.putNumber("Robot Pose Y", getPosition().getTranslation().getY());
+    // SmartDashboard.putNumber("Robot Pose X", getPosition().getTranslation().getX());
+    // SmartDashboard.putNumber("Robot Pose Y", getPosition().getTranslation().getY());
     SmartDashboard.putNumber("Robot Pose Degrees", getPosition().getRotation().getDegrees());
     SmartDashboard.putNumber("Actual Robot Heading", drive_.getAngle().getDegrees());
     SmartDashboard.putNumber("Estimated Robot Heading", getDegree());

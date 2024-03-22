@@ -11,6 +11,7 @@ import org.ghrobotics.frc2024.subsystems.Shooter;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.path.PathPlannerTrajectory;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
@@ -67,7 +68,7 @@ public class AutoSelector {
     feeder_ = feeder;
 
     routine_chooser_ = new SendableChooser<Command>();
-    routine_chooser_.setDefaultOption("Four Note Auto", fourNoteFull());
+    
 
     stop_all_motor = new ParallelCommandGroup(
       new InstantCommand(() -> intake_.stopMotor()),
@@ -97,6 +98,8 @@ public class AutoSelector {
       },
       drive_
     );
+
+    routine_chooser_.setDefaultOption("Four Note Auto", fourNoteFull());
   }
 
   public Command getSelectedRoutine() {
@@ -108,10 +111,11 @@ public class AutoSelector {
       fourNotePt1().withTimeout(5.0),
       fourNotePt2().withTimeout(6.0),
       fourNotePt3().withTimeout(6.0),
-      new ArmPID(arm_, 36.85),
+      new ArmPID(arm_, 32.85),
+      new WaitCommand(0.2),
       new InstantCommand(() -> feeder_.setPercent(0.75)),
-      new InstantCommand(() -> intake_.setPercent(-0.5)),
-      new WaitCommand(2.0),
+      new InstantCommand(() -> intake_.setPercent(0.5)),
+      new WaitCommand(1.0),
       new ArmPID(arm_, 2)
     );
   }
@@ -119,16 +123,16 @@ public class AutoSelector {
   public Command fourNotePt1() {
     return new ParallelCommandGroup(
       // Rev shooter, follow path to intake
-      new InstantCommand(() -> shooter_.setPercent(-0.75)),
+      new InstantCommand(() -> shooter_.setPercent(0.75)),
       AutoBuilder.followPath(left_intake_path),
       new SequentialCommandGroup(
-        new ArmPID(arm_, 28),
+        new ArmPID(arm_, 25),
         new WaitCommand(0.5),
-        new InstantCommand(() -> intake_.setPercent(-0.35)),
+        new InstantCommand(() -> intake_.setPercent(0.55)),
         new InstantCommand(() -> feeder_.setPercent(0.5)),
         new WaitCommand(0.2),
         new ArmPID(arm_, 2),
-        new InstantCommand(() -> intake_.setPercent(-0.35)),
+        new InstantCommand(() -> intake_.setPercent(0.55)),
         new InstantCommand(() -> feeder_.stopMotor())
       )
     );
@@ -140,13 +144,13 @@ public class AutoSelector {
       // new InstantCommand(() -> shooter_.setPercent(-0.75)),
       AutoBuilder.followPath(middle_intake_path),
       new SequentialCommandGroup(
-        new ArmPID(arm_, 32),
+        new ArmPID(arm_, 29),
         new WaitCommand(0.5),
-        new InstantCommand(() -> intake_.setPercent(-0.35)),
+        new InstantCommand(() -> intake_.setPercent(0.55)),
         new InstantCommand(() -> feeder_.setPercent(0.5)),
         new WaitCommand(0.5),
         new ArmPID(arm_, 2),
-        new InstantCommand(() -> intake_.setPercent(-0.35)),
+        new InstantCommand(() -> intake_.setPercent(0.55)),
         new InstantCommand(() -> feeder_.stopMotor())
       )
     );
@@ -156,14 +160,14 @@ public class AutoSelector {
     return new ParallelCommandGroup(
       AutoBuilder.followPath(right_intake_path),
       new SequentialCommandGroup(
-        new ArmPID(arm_, 32),
+        new ArmPID(arm_, 29),
         new WaitCommand(0.5),
         new InstantCommand(() -> feeder_.setPercent(0.5)),
-        new InstantCommand(() -> intake_.setPercent(-0.35)),
+        new InstantCommand(() -> intake_.setPercent(0.55)),
         new WaitCommand(0.5),
         new ArmPID(arm_, 2).withTimeout(1.5),
         new InstantCommand(() -> feeder_.stopMotor()),
-        new InstantCommand(() -> intake_.setPercent(-0.35))
+        new InstantCommand(() -> intake_.setPercent(0.55))
         
       )
     );
@@ -178,11 +182,11 @@ public class AutoSelector {
         new SequentialCommandGroup(
           new ArmPID(arm_, 28),
           new WaitCommand(0.5),
-          new InstantCommand(() -> intake_.setPercent(-0.35)),
+          new InstantCommand(() -> intake_.setPercent(0.55)),
           new InstantCommand(() -> feeder_.setPercent(0.5)),
           new WaitCommand(0.2),
           new ArmPID(arm_, 2),
-          new InstantCommand(() -> intake_.setPercent(-0.35)),
+          new InstantCommand(() -> intake_.setPercent(0.55)),
           new InstantCommand(() -> feeder_.stopMotor())
         )
       ),
@@ -246,12 +250,12 @@ public class AutoSelector {
   public Command followPath() {
     return new SequentialCommandGroup(
       new ParallelCommandGroup(
-        new ArmPID(arm_, 20),
-        new InstantCommand(() -> shooter_.setPercent(-0.75))
+        new ArmPID(arm_, 16.5),
+        new InstantCommand(() -> shooter_.setPercent(0.75))
       ),
       new WaitCommand(0.2),
       new ParallelCommandGroup(
-        new InstantCommand(() -> intake_.setPercent(-0.5)),
+        new InstantCommand(() -> intake_.setPercent(0.5)),
         new InstantCommand(() -> feeder_.setPercent(0.5))
       ),
       new WaitCommand(1.0),
@@ -262,7 +266,7 @@ public class AutoSelector {
       ),
       new ParallelCommandGroup(
         new ArmPID(arm_, 2),
-        new InstantCommand(() -> intake_.setPercent(-0.25)),
+        new InstantCommand(() -> intake_.setPercent(0.55)),
         AutoBuilder.followPath(middle_middle_intake_path)
       ),
       new WaitCommand(0.5),
@@ -272,12 +276,12 @@ public class AutoSelector {
         new InstantCommand(() -> shooter_.stopMotor())
       ),
       new ParallelCommandGroup(
-        new ArmPID(arm_, 30.75),
-        new InstantCommand(() -> shooter_.setPercent(-0.75))
+        new ArmPID(arm_, 26.75),
+        new InstantCommand(() -> shooter_.setPercent(0.75))
       ),
       new WaitCommand(0.3), // This one might be needed originally set to 1
       new ParallelCommandGroup(
-        new InstantCommand(() -> intake_.setPercent(-0.5)),
+        new InstantCommand(() -> intake_.setPercent(0.5)),
         new InstantCommand(() -> feeder_.setPercent(0.5))
       ),
       new WaitCommand(0.8),
@@ -289,7 +293,7 @@ public class AutoSelector {
       ),
       new WaitCommand(0.1),
       new ParallelCommandGroup(
-        new InstantCommand(() -> intake_.setPercent(-0.35)),
+        new InstantCommand(() -> intake_.setPercent(0.35)),
         AutoBuilder.followPath(middle_left_intake_path)
       ),
       new WaitCommand(0.3),
@@ -299,13 +303,13 @@ public class AutoSelector {
         new InstantCommand(() -> shooter_.stopMotor())
       ),
       new ParallelCommandGroup(
-        new InstantCommand(() -> shooter_.setPercent(-0.75)),
+        new InstantCommand(() -> shooter_.setPercent(0.75)),
         AutoBuilder.followPath(left_shoot_path),
-        new ArmPID(arm_, 34.2)
+        new ArmPID(arm_, 30.2)
       ),
       new WaitCommand(0.8),
       new ParallelCommandGroup(
-        new InstantCommand(() -> intake_.setPercent(-0.5)),
+        new InstantCommand(() -> intake_.setPercent(0.5)),
         new InstantCommand(() -> feeder_.setPercent(0.5))
       ),
       // End of Auto (moves arm down and turns off all motors)
@@ -321,22 +325,17 @@ public class AutoSelector {
 
   public Command justPath() {
     return new SequentialCommandGroup(
-      AutoBuilder.followPath(middle_middle_intake_path),
-
-      new ParallelCommandGroup(
-        new InstantCommand(() -> intake_.setPercent(-0.25)),
-        AutoBuilder.followPath(middle_left_intake_path)
-      ),
-      new ParallelCommandGroup(
-        new InstantCommand(() -> intake_.stopMotor()),
-        AutoBuilder.followPath(left_shoot_path)
-      )
+      AutoBuilder.followPath(left_one_intake_path)
     );
   }
 
   // Get starting pose of autonomous path
   public Pose2d getStartingPose() {
-    return left_intake_path.getStartingDifferentialPose();
+    return middle_middle_intake_path.getStartingDifferentialPose();
+  }
+
+  public PathPlannerPath getPath() {
+    return left_one_intake_path;
   }
   
 

@@ -69,8 +69,13 @@ public class Shooter extends SubsystemBase {
 
     switch (output_type_) {
       case PERCENT:
-        left_leader_.set(io_.demand);
-        right_leader_.set(io_.demand);
+        if(io_.demand <= 0.1) {
+          left_leader_.set(io_.demand);
+          right_leader_.set(io_.demand);
+        } else {
+          left_leader_.set(io_.demand);
+          right_leader_.set(io_.demand - 0.15);
+        }
         break;
       case VELOCITY:
         double left_feedback = pid_.calculate(io_.left_velocity);

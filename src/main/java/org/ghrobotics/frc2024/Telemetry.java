@@ -3,13 +3,24 @@ package org.ghrobotics.frc2024;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.ghrobotics.frc2024.auto.AutoSelector;
 import org.ghrobotics.frc2024.subsystems.Arm;
 
+import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.path.PathPlannerTrajectory;
+import com.pathplanner.lib.path.PathPlannerTrajectory.State;
+
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 
@@ -22,8 +33,15 @@ public class Telemetry {
 
   private final Mechanism2d superstructure_;
 
+  private final AutoSelector auto_selector_;
 
-  public Telemetry(RobotState robot_state, Arm arm) {
+
+  // Timer for trajectory
+  Timer timer_ = new Timer();
+
+
+  public Telemetry(RobotState robot_state, Arm arm, AutoSelector auto_selector) {
+    auto_selector_ = auto_selector;
     ShuffleboardTab tab_ = Shuffleboard.getTab("2024");
 
     field_ = new Field2d();
@@ -31,7 +49,7 @@ public class Telemetry {
         if (Robot.isReal())
             periodic_registry_.add(() -> field_.setRobotPose(robot_state.getPosition()));
         if(!Robot.isReal())
-            field_.setRobotPose(null);
+            field_.setRobotPose(new Pose2d(3, 3, Rotation2d.fromDegrees(0)));
 
     superstructure_ = new Mechanism2d(1.2, 1.2);
 
@@ -49,5 +67,22 @@ public class Telemetry {
     for (Runnable fn : periodic_registry_)
       fn.run();
     // System.out.println(periodic_registry_);
+
+    // SmartDashboard.putData((Sendable) periodic_registry_);
+
   }
+
+  public void simulationPeriodic() {
+    PathPlannerTrajectory simulate_trajectory = auto_selector_.getPath().
+      getTrajectory(new ChassisSpeeds(), auto_selector_.getStartingPose().getRotation());
+    timer_.reset();
+    timer_.start();
+
+    while (timer_.get() <= simulate_trajectory.getTotalTimeSeconds()) {
+      State state = simulate_trajectory.sample(timer_.get());
+
+      field_.setRobotPose(state.getTargetHolonomicPose());
+    }
+  }
+
 }

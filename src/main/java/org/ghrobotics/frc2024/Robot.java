@@ -16,6 +16,7 @@ import org.ghrobotics.frc2024.subsystems.Shooter;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -44,9 +45,6 @@ public class Robot extends TimedRobot {
   // Robot State
   private final RobotState robot_state_ = new RobotState(drive_, limelight_);
 
-  // Telemetry
-  private final Telemetry telemetry_ = new Telemetry(robot_state_, arm_);
-
   private double brake_value_ = 0.05;
   
   // Controller
@@ -57,15 +55,20 @@ public class Robot extends TimedRobot {
   private final Superstructure superstructure_ = new Superstructure(arm_, intake_, shooter_, feeder_, robot_state_);
   private final AutoSelector auto_selector_= new AutoSelector(drive_, robot_state_, superstructure_, arm_, intake_, shooter_, feeder_);
 
+  // Telemetry
+  private final Telemetry telemetry_ = new Telemetry(robot_state_, arm_, auto_selector_);
+
   @Override
   public void robotInit() {
     drive_.setDefaultCommand(new DriveTeleop(drive_, robot_state_, driver_controller_));
 
     SmartDashboard.putData("field", field_);
+    // SmartDashboard.putData("Current Trajectory", (Sendable) auto_selector_.getPath());
+    System.out.println("Robot Init");
     setupTeleopControls();
 
     // Just to test the blue subwoofer distance
-    robot_state_.reset(new Pose2d(1.363, 5.517, Rotation2d.fromDegrees(0)));
+    // robot_state_.reset(limelight_.getEstimatedVisionRobotPose());
   }
   
   @Override
@@ -74,13 +77,16 @@ public class Robot extends TimedRobot {
 
     superstructure_.periodic();
     telemetry_.periodic();
-    robot_state_.update();
+    if(!Robot.isSimulation())
+      robot_state_.update();
 
+    SmartDashboard.putBoolean("Auto", isAuto);
     SmartDashboard.putNumber("Vision x", limelight_.getBotPose2d().getX());
     SmartDashboard.putNumber("Vision y", limelight_.getBotPose2d().getY());
     SmartDashboard.putNumber("Vision Degrees", limelight_.getBotPose2d().getRotation().getDegrees());
 
-    field_.setRobotPose(robot_state_.getPosition());
+    if(!Robot.isSimulation())
+      field_.setRobotPose(robot_state_.getPosition());
   }
 
 
@@ -88,24 +94,24 @@ public class Robot extends TimedRobot {
   public void autonomousInit() {
     isAuto = true;
 
-    robot_state_.reset(new Pose2d(
-      auto_selector_.getStartingPose().getX(), 
-      auto_selector_.getStartingPose().getY(), 
-      Rotation2d.fromDegrees(0)));
-    auto_selector_.fourNoteFull().schedule();
+    robot_state_.reset(auto_selector_.getStartingPose());
+    auto_selector_.followPath().schedule();
 
     drive_.setBrakeMode(true);
     arm_.setBrakeMode(true);
   }
   
   @Override
-  public void autonomousPeriodic() {}
+  public void autonomousPeriodic() {
+    if(Robot.isSimulation())
+      telemetry_.simulationPeriodic();
+  }
   
 
   @Override
   public void teleopInit() {
     isAuto = false;
-
+    robot_state_.reset(limelight_.getEstimatedVisionRobotPose());
     drive_.setBrakeMode(true);
     arm_.setBrakeMode(true);
   }
@@ -140,13 +146,13 @@ public class Robot extends TimedRobot {
     //  * RT:  Spin Shooter
     driver_controller_.rightTrigger().whileTrue(superstructure_.setShooterPercent(0.75));
 
-    driver_controller_.rightBumper().whileTrue(superstructure_.setShooterPercent(0.65));
+    driver_controller_.rightBumper().whileTrue(superstructure_.setShooterPercent(0.95));
 
     // driver_controller_.pov(180).whileTrue(superstructure_.setShooter(0.55));
 
     // driver_controller_.pov(270).whileTrue(superstructure_.setShooter(85));
 
-    driver_controller_.leftTrigger().whileTrue(superstructure_.setIntake(0.65));
+    driver_controller_.leftTrigger().whileTrue(superstructure_.setIntake(0.55));
 
     driver_controller_.leftBumper().whileTrue(superstructure_.setIntake(-0.25));
 

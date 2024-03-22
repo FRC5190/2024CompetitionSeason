@@ -3,10 +3,14 @@ package org.ghrobotics.frc2024;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
+
+import java.util.function.DoubleSupplier;
+
 import org.ghrobotics.frc2024.commands.ArmPID;
 import org.ghrobotics.frc2024.subsystems.Arm;
 import org.ghrobotics.frc2024.subsystems.Feeder;
@@ -20,7 +24,7 @@ public class Superstructure {
   private final Shooter shooter_;
   private final Feeder feeder_;
   private final RobotState robot_state_;
-  private final ShootingPosition shootingPosition_ = new ShootingPosition();
+  // private final ShootingPosition shootingPosition_ = new ShootingPosition();
   
 
   //Store Position
@@ -40,9 +44,9 @@ public class Superstructure {
   }
 
   public void periodic() {
-    shootingDistance = shootingPosition_.distanceToSpeaker(robot_state_.getPosition(), ShootingPosition.Constants.kBlueSubwooferPose);
+    // shootingDistance = shootingPosition_.distanceToSpeaker(robot_state_.getPosition(), ShootingPosition.Constants.kBlueSubwooferPose);
     SmartDashboard.putNumber("Distance from speaker", shootingDistance);
-    armShootingAngle = shootingPosition_.regressionFormula(shootingDistance);
+    // armShootingAngle = shootingPosition_.regressionFormula(shootingDistance);
 
     SmartDashboard.putNumber("Arm Angle", Math.toDegrees(arm_.getAngle()));
 
@@ -51,7 +55,7 @@ public class Superstructure {
     SmartDashboard.putString("Superstructure State", state);
 
     // Checks output current to see if note has intaked or not (current > 35 means intaked)
-    if (intake_.getLeftOutputCurrent() > 35) {
+    if (intake_.getRightOutputCurrent() > 45) {
       LimelightHelpers.setLEDMode_ForceOn("limelight");
     }
   }

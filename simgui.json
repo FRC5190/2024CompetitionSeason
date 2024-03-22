@@ -1,7 +1,30 @@
 {
+  "HALProvider": {
+    "Other Devices": {
+      "window": {
+        "visible": false
+      }
+    }
+  },
   "NTProvider": {
     "types": {
-      "/FMSInfo": "FMSInfo"
+      "/FMSInfo": "FMSInfo",
+      "/Shuffleboard/2024/Field": "Field2d",
+      "/Shuffleboard/2024/Superstructure": "Mechanism2d",
+      "/SmartDashboard/field": "Field2d"
+    },
+    "windows": {
+      "/Shuffleboard/2024/Field": {
+        "bottom": 1476,
+        "height": 8.210550308227539,
+        "left": 150,
+        "right": 2961,
+        "top": 79,
+        "width": 16.541748046875,
+        "window": {
+          "visible": true
+        }
+      }
     }
   },
   "NetworkTables": {
@@ -23,6 +46,11 @@
     }
   },
   "NetworkTables Info": {
-    "visible": true
+    "Clients": {
+      "open": true
+    },
+    "DartClient_13310512@1": {
+      "open": true
+    }
   }
 }
