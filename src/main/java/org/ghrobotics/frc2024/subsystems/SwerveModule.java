@@ -39,11 +39,13 @@ public class SwerveModule {
     drive_motor_.restoreFactoryDefaults();
     drive_motor_.setIdleMode(CANSparkMax.IdleMode.kCoast);
     drive_motor_.setInverted(configuration_.invert);
+    drive_motor_.setSmartCurrentLimit(35);
     
     steer_motor_ = new CANSparkMax(configuration_.steer_id, CANSparkMax.MotorType.kBrushless);
     steer_motor_.restoreFactoryDefaults();
     steer_motor_.setIdleMode(CANSparkMax.IdleMode.kCoast);
     steer_motor_.setInverted(true);
+    steer_motor_.setSmartCurrentLimit(35);
     
     // Initialize encoders
     drive_encoder_ = drive_motor_.getEncoder();

@@ -8,6 +8,7 @@ import org.ghrobotics.frc2024.auto.AutoSelector;
 import org.ghrobotics.frc2024.commands.ArmPID;
 import org.ghrobotics.frc2024.commands.DriveTeleop;
 import org.ghrobotics.frc2024.subsystems.Arm;
+import org.ghrobotics.frc2024.subsystems.Climber;
 import org.ghrobotics.frc2024.subsystems.Drive;
 import org.ghrobotics.frc2024.subsystems.Feeder;
 import org.ghrobotics.frc2024.subsystems.Intake;
@@ -21,6 +22,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 /**
@@ -36,6 +38,7 @@ public class Robot extends TimedRobot {
   private final Intake intake_ = new Intake();
   private final Shooter shooter_ = new Shooter();
   private final Feeder feeder_ = new Feeder();
+  private final Climber climber_ = new Climber();
   private final Limelight limelight_ = new Limelight("limelight");
 
   private final Field2d field_ = new Field2d();
@@ -52,7 +55,7 @@ public class Robot extends TimedRobot {
   private final CommandXboxController operator_controller_ = new CommandXboxController(1);
 
   // Superstructure
-  private final Superstructure superstructure_ = new Superstructure(arm_, intake_, shooter_, feeder_, robot_state_);
+  private final Superstructure superstructure_ = new Superstructure(arm_, intake_, shooter_, feeder_, climber_);
   private final AutoSelector auto_selector_= new AutoSelector(drive_, robot_state_, superstructure_, arm_, intake_, shooter_, feeder_);
 
   // Telemetry
@@ -76,7 +79,7 @@ public class Robot extends TimedRobot {
     CommandScheduler.getInstance().run();
 
     superstructure_.periodic();
-    telemetry_.periodic();
+    // telemetry_.periodic();
     if(!Robot.isSimulation())
       robot_state_.update();
 
@@ -85,8 +88,11 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Vision y", limelight_.getBotPose2d().getY());
     SmartDashboard.putNumber("Vision Degrees", limelight_.getBotPose2d().getRotation().getDegrees());
 
-    if(!Robot.isSimulation())
-      field_.setRobotPose(robot_state_.getPosition());
+    SmartDashboard.putData(auto_selector_.getRoutineChooser());
+    SmartDashboard.putData(auto_selector_.getPositionChooser());
+
+    // if(!Robot.isSimulation())
+    //   field_.setRobotPose(robot_state_.getPosition());
   }
 
 
@@ -94,8 +100,8 @@ public class Robot extends TimedRobot {
   public void autonomousInit() {
     isAuto = true;
 
-    robot_state_.reset(auto_selector_.getStartingPose());
-    auto_selector_.followPath().schedule();
+    robot_state_.reset(auto_selector_.getSelectedPose2d());
+    auto_selector_.getSelectedRoutine().schedule();
 
     drive_.setBrakeMode(true);
     arm_.setBrakeMode(true);
@@ -103,8 +109,8 @@ public class Robot extends TimedRobot {
   
   @Override
   public void autonomousPeriodic() {
-    if(Robot.isSimulation())
-      telemetry_.simulationPeriodic();
+    // if(Robot.isSimulation())
+    //   telemetry_.simulationPeriodic();
   }
   
 
@@ -144,9 +150,9 @@ public class Robot extends TimedRobot {
 
     // Driver Control
     //  * RT:  Spin Shooter
-    driver_controller_.rightTrigger().whileTrue(superstructure_.setShooterPercent(0.75));
+    driver_controller_.rightTrigger().whileTrue(superstructure_.setShooterPercent(0.85));
 
-    driver_controller_.rightBumper().whileTrue(superstructure_.setShooterPercent(0.95));
+    driver_controller_.rightBumper().whileTrue(superstructure_.setShooterPercent(-0.6));
 
     // driver_controller_.pov(180).whileTrue(superstructure_.setShooter(0.55));
 
@@ -159,6 +165,10 @@ public class Robot extends TimedRobot {
     driver_controller_.pov(0).whileTrue(superstructure_.setArmPercent(0.056));
 
     driver_controller_.a().whileTrue(superstructure_.setFeeder(0.85));
+
+    driver_controller_.b().whileTrue(superstructure_.setFeeder(-0.75));
+
+    driver_controller_.y().onTrue(new InstantCommand(() -> drive_.resetGyro()));
 
     // driver_controller_.pov(90).whileTrue(superstructure_.setShooter(90));
     
@@ -175,9 +185,17 @@ public class Robot extends TimedRobot {
 
     operator_controller_.a().onTrue(superstructure_.setPosition(Superstructure.Position.GROUND_INTAKE));
 
-    operator_controller_.y().onTrue(superstructure_.setPosition(Superstructure.Position.SUBWOOFER));
+    operator_controller_.y().onTrue(superstructure_.setPosition(Superstructure.Position.STOW));
 
-    operator_controller_.x().onTrue(new ArmPID(arm_, 55));
+    operator_controller_.x().onTrue(new ArmPID(arm_, 35));
+
+    operator_controller_.leftBumper().whileTrue(superstructure_.setLeftClimber(0.5));
+
+     operator_controller_.rightBumper().whileTrue(superstructure_.setRightClimber(0.8));
+
+     operator_controller_.leftTrigger().whileTrue(superstructure_.setLeftClimber(-0.5));
+
+     operator_controller_.rightTrigger().whileTrue(superstructure_.setRightClimber(-0.8));
 
     operator_controller_.pov(0).whileTrue(superstructure_.setArmPercent(0.25));
     

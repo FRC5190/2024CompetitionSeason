@@ -44,6 +44,9 @@ public class Telemetry {
     auto_selector_ = auto_selector;
     ShuffleboardTab tab_ = Shuffleboard.getTab("2024");
 
+    tab_.add(auto_selector.getRoutineChooser());
+    tab_.add(auto_selector.getPositionChooser());
+    
     field_ = new Field2d();
         tab_.add("Field", field_);
         if (Robot.isReal())
@@ -73,16 +76,16 @@ public class Telemetry {
   }
 
   public void simulationPeriodic() {
-    PathPlannerTrajectory simulate_trajectory = auto_selector_.getPath().
-      getTrajectory(new ChassisSpeeds(), auto_selector_.getStartingPose().getRotation());
-    timer_.reset();
-    timer_.start();
+    // // PathPlannerTrajectory simulate_trajectory = auto_selector_.getPath().
+    //   getTrajectory(new ChassisSpeeds(), auto_selector_.getStartingPose().getRotation());
+    // timer_.reset();
+    // timer_.start();
 
-    while (timer_.get() <= simulate_trajectory.getTotalTimeSeconds()) {
-      State state = simulate_trajectory.sample(timer_.get());
+    // while (timer_.get() <= simulate_trajectory.getTotalTimeSeconds()) {
+    //   State state = simulate_trajectory.sample(timer_.get());
 
-      field_.setRobotPose(state.getTargetHolonomicPose());
-    }
+    //   field_.setRobotPose(state.getTargetHolonomicPose());
+    // }
   }
 
 }

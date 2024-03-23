@@ -23,6 +23,7 @@ public class Drive extends SubsystemBase {
   
   // navX Gyro
   private final AHRS gyro_;
+
   
   // Kinematics
   SwerveDriveKinematics kinematics_ = new SwerveDriveKinematics(
@@ -45,6 +46,8 @@ public class Drive extends SubsystemBase {
       } catch (Exception ignored) {
       }
     }).start();
+
+    // io_.reset_gyro ;
   }
   
   @Override
@@ -65,6 +68,11 @@ public class Drive extends SubsystemBase {
       // SmartDashboard.putNumber(String.format("Module [%d] Angle", i),
       //   modules_[i].getSteerPosition().getDegrees());
     }
+
+    if (io_.reset_gyro) {
+      gyro_.zeroYaw();
+      io_.reset_gyro = false;
+    }
   }
   
   // Get Module Positions
@@ -75,6 +83,11 @@ public class Drive extends SubsystemBase {
       back_left_.getModulePosition(),
       back_right_.getModulePosition(),
     };
+  }
+
+  // Reset Gyro
+  public void resetGyro() {
+    io_.reset_gyro = true;
   }
   
   // Get Gyro Angle
@@ -131,6 +144,8 @@ public class Drive extends SubsystemBase {
   private static class IO {
     // Inputs
     double angle;
+
+    boolean reset_gyro;
     
     // Outputs
     ChassisSpeeds speeds = new ChassisSpeeds();

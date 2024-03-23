@@ -141,6 +141,6 @@ public class Shooter extends SubsystemBase {
     public static final double kP = 2.8;
 
     // Current Limit
-    public static final double kCurrentLimit = 35;
+    public static final double kCurrentLimit = 30;
   }
 }

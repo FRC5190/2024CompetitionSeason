@@ -30,6 +30,9 @@ public class Intake extends SubsystemBase {
     leader_right_.setIdleMode(CANSparkMax.IdleMode.kBrake);
     leader_right_.follow(leader_left_);
 
+    // Safety
+    leader_left_.setSmartCurrentLimit(30);
+    leader_right_.setSmartCurrentLimit(30);
     
   }
   
@@ -39,7 +42,12 @@ public class Intake extends SubsystemBase {
     io_.current_right_ = leader_right_.getOutputCurrent();
     SmartDashboard.putNumber("Left Intake current", io_.current_left_);
     SmartDashboard.putNumber("Right Intake current", io_.current_right_);
-    leader_left_.set(io_.left_demand);
+    if(io_.left_demand == 0) {
+      leader_left_.set(io_.left_demand);
+    } else {
+      leader_left_.set(io_.left_demand - 0.3);
+    }
+    
     leader_right_.set(-io_.right_demand);
   }
 

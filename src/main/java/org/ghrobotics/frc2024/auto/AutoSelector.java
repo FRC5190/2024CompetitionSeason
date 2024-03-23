@@ -39,12 +39,16 @@ public class AutoSelector {
   // Sendable chooser
   private final SendableChooser<Command> routine_chooser_;
 
+  private final SendableChooser<Pose2d> starting_position_chooser_;
+
   // Different Paths
   PathPlannerPath middle_middle_intake_path = PathPlannerPath.fromPathFile("middle_middle_intake");
   PathPlannerPath middle_middle_shoot_path = PathPlannerPath.fromPathFile("middle_middle_shoot");
   PathPlannerPath middle_right_intake_path = PathPlannerPath.fromPathFile("middle_right_intake");
   PathPlannerPath middle_left_intake_path = PathPlannerPath.fromPathFile("middle_left_intake");
   PathPlannerPath left_shoot_path = PathPlannerPath.fromPathFile("left_shoot");
+
+  PathPlannerPath go_straight_path = PathPlannerPath.fromPathFile("go_straight");
 
   // Helper Commands
   Command stop_all_motor;
@@ -54,7 +58,9 @@ public class AutoSelector {
   PathPlannerPath middle_intake_path = PathPlannerPath.fromPathFile("middle_intake");
   PathPlannerPath right_intake_path = PathPlannerPath.fromPathFile("right_intake");
 
-  PathPlannerPath left_one_intake_path = PathPlannerPath.fromPathFile("left_one_intake");
+  PathPlannerPath left_one_intake_close_path = PathPlannerPath.fromPathFile("left_one_intake");
+
+  // PathPlannerPath left_one_intake_path = PathPlannerPath.fromPathFile("left_one_intake");
 
   Command autonomous_command_;
 
@@ -92,23 +98,48 @@ public class AutoSelector {
         new ReplanningConfig()
       ),
       () -> {
-        var alliance = DriverStation.getAlliance();
-        if (alliance.isPresent()) {
-          return alliance.get() == DriverStation.Alliance.Red;
-        }
+        // var alliance = DriverStation.getAlliance();
+        // if (alliance.isPresent()) {
+        //   return alliance.get() == DriverStation.Alliance.Red;
+        // }
         return false;
       },
       drive_
     );
+    
+    starting_position_chooser_ = new SendableChooser<Pose2d>();
 
     routine_chooser_ = AutoBuilder.buildAutoChooser();
-    routine_chooser_.setDefaultOption("Four Note Auto", fourNoteFull());
+    routine_chooser_.setDefaultOption("One Shot Taxi Straight", shootTaxi());
+    routine_chooser_.addOption("Four note Auto", fourNoteFull());
+    routine_chooser_.addOption("Three Note Left Auto", threeNoteMiddleAuto());
+
+    starting_position_chooser_.setDefaultOption("One Shot Taxi Straight pose", getOneShotTaxiPose2d());
+    starting_position_chooser_.addOption("Four Note Auto Pose", getFourNotePose2d());
+    starting_position_chooser_.addOption("Three Note Left Auto Pose", getThreeNoteMiddlePose2d());
   }
 
-  public Command run()
+
+  // public Command leftTwoNoteAuto() {
+  //   return new SequentialCommandGroup(
+      
+  //   )
+  // }
+
+  public SendableChooser<Command> getRoutineChooser() {
+    return routine_chooser_;
+  }
+
+  public SendableChooser<Pose2d> getPositionChooser() {
+    return starting_position_chooser_;
+  }
 
   public Command getSelectedRoutine() {
     return routine_chooser_.getSelected();
+  }
+
+  public Pose2d getSelectedPose2d() {
+    return starting_position_chooser_.getSelected();
   }
 
   public Command fourNoteFull() {
@@ -121,7 +152,11 @@ public class AutoSelector {
       new InstantCommand(() -> feeder_.setPercent(0.75)),
       new InstantCommand(() -> intake_.setPercent(0.5)),
       new WaitCommand(1.0),
-      new ArmPID(arm_, 2)
+      new ArmPID(arm_, 2),
+      new WaitCommand(0.2),
+      new InstantCommand(() -> shooter_.stopMotor()),
+      new InstantCommand(() -> intake_.stopMotor()),
+      new InstantCommand(() -> feeder_.stopMotor())
     );
   }
 
@@ -131,7 +166,7 @@ public class AutoSelector {
       new InstantCommand(() -> shooter_.setPercent(0.75)),
       AutoBuilder.followPath(left_intake_path),
       new SequentialCommandGroup(
-        new ArmPID(arm_, 25),
+        new ArmPID(arm_, 24.9),
         new WaitCommand(0.5),
         new InstantCommand(() -> intake_.setPercent(0.55)),
         new InstantCommand(() -> feeder_.setPercent(0.5)),
@@ -149,8 +184,8 @@ public class AutoSelector {
       // new InstantCommand(() -> shooter_.setPercent(-0.75)),
       AutoBuilder.followPath(middle_intake_path),
       new SequentialCommandGroup(
-        new ArmPID(arm_, 29),
-        new WaitCommand(0.5),
+        new ArmPID(arm_, 26.2),
+        new WaitCommand(0.6),
         new InstantCommand(() -> intake_.setPercent(0.55)),
         new InstantCommand(() -> feeder_.setPercent(0.5)),
         new WaitCommand(0.5),
@@ -165,7 +200,7 @@ public class AutoSelector {
     return new ParallelCommandGroup(
       AutoBuilder.followPath(right_intake_path),
       new SequentialCommandGroup(
-        new ArmPID(arm_, 29),
+        new ArmPID(arm_, 26.4),
         new WaitCommand(0.5),
         new InstantCommand(() -> feeder_.setPercent(0.5)),
         new InstantCommand(() -> intake_.setPercent(0.55)),
@@ -237,22 +272,41 @@ public class AutoSelector {
     return new SequentialCommandGroup(
       new ParallelCommandGroup(
         // Rev shooter, follow path to intake
-        new InstantCommand(() -> shooter_.setPercent(-0.75)),
+        new InstantCommand(() -> shooter_.setPercent(0.75)),
         AutoBuilder.followPath(middle_middle_intake_path),
         new SequentialCommandGroup(
-          new ArmPID(arm_, 28),
-          new InstantCommand(() -> intake_.setPercent(-0.5)),
+          new ArmPID(arm_, 30),
+          new InstantCommand(() -> intake_.setPercent(0.5)),
           new InstantCommand(() -> feeder_.setPercent(0.5)),
           new WaitCommand(0.15),
           new ArmPID(arm_, 2),
-          new InstantCommand(() -> intake_.setPercent(-0.5)),
-          new InstantCommand(() -> feeder_.stopMotor())
+          new InstantCommand(() -> intake_.setPercent(0.5)),
+          new InstantCommand(() -> feeder_.stopMotor()),
+          new InstantCommand(() -> shooter_.stopMotor()),
+          new WaitCommand(2.0),
+          new InstantCommand(() -> intake_.stopMotor())
         )
       )
     );
   }
 
-  public Command followPath() {
+  public Command shootTaxi() {
+    return new SequentialCommandGroup(
+      new InstantCommand(() -> shooter_.setPercent(0.75)),
+      new ArmPID(arm_, 16.5),
+      new WaitCommand(0.4),
+      new InstantCommand(() -> intake_.setPercent(0.5)),
+      new InstantCommand(() -> feeder_.setPercent(0.5)),
+      new WaitCommand(1.0),
+      new ArmPID(arm_, 2),
+      AutoBuilder.followPath(go_straight_path),
+      new InstantCommand(() -> shooter_.stopMotor()),
+      new InstantCommand(() -> intake_.stopMotor()),
+      new InstantCommand(() -> feeder_.stopMotor())
+    );
+  }
+
+  public Command threeNoteMiddleAuto() {
     return new SequentialCommandGroup(
       new ParallelCommandGroup(
         new ArmPID(arm_, 16.5),
@@ -284,7 +338,7 @@ public class AutoSelector {
         new ArmPID(arm_, 26.75),
         new InstantCommand(() -> shooter_.setPercent(0.75))
       ),
-      new WaitCommand(0.3), // This one might be needed originally set to 1
+      new WaitCommand(0.8), // This one might be needed originally set to 1
       new ParallelCommandGroup(
         new InstantCommand(() -> intake_.setPercent(0.5)),
         new InstantCommand(() -> feeder_.setPercent(0.5))
@@ -330,18 +384,23 @@ public class AutoSelector {
 
   public Command justPath() {
     return new SequentialCommandGroup(
-      AutoBuilder.followPath(left_one_intake_path)
+      // AutoBuilder.followPath(left_one_intake_path)
     );
   }
 
   // Get starting pose of autonomous path
-  public Pose2d getStartingPose() {
+  public Pose2d getOneShotTaxiPose2d() {
+    return go_straight_path.getStartingDifferentialPose();
+  }
+
+  public Pose2d getFourNotePose2d() {
+    return left_intake_path.getStartingDifferentialPose();
+  }
+
+  public Pose2d getThreeNoteMiddlePose2d() {
     return middle_middle_intake_path.getStartingDifferentialPose();
   }
 
-  public PathPlannerPath getPath() {
-    return left_one_intake_path;
-  }
 
   public enum Routine {
     FOUR_NOTE_AUTO,

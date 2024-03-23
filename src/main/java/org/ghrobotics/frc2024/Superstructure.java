@@ -13,6 +13,7 @@ import java.util.function.DoubleSupplier;
 
 import org.ghrobotics.frc2024.commands.ArmPID;
 import org.ghrobotics.frc2024.subsystems.Arm;
+import org.ghrobotics.frc2024.subsystems.Climber;
 import org.ghrobotics.frc2024.subsystems.Feeder;
 import org.ghrobotics.frc2024.subsystems.Intake;
 import org.ghrobotics.frc2024.subsystems.Shooter;
@@ -23,6 +24,7 @@ public class Superstructure {
   private final Intake intake_;
   private final Shooter shooter_;
   private final Feeder feeder_;
+  private final Climber climber_;
   private final RobotState robot_state_;
   // private final ShootingPosition shootingPosition_ = new ShootingPosition();
   
@@ -35,11 +37,12 @@ public class Superstructure {
   public double shootingDistance;
 
   // Constructor
-  public Superstructure(Arm arm, Intake intake, Shooter shooter, Feeder feeder, RobotState robot_state) {
+  public Superstructure(Arm arm, Intake intake, Shooter shooter, Feeder feeder, RobotState robot_state, Climber climber) {
     arm_ = arm;
     intake_ = intake;
     shooter_ = shooter;
     feeder_ = feeder;
+    climber_ = climber;
     robot_state_ = robot_state;
   }
 
@@ -155,6 +158,22 @@ public class Superstructure {
     );
   }
 
+  public Command setLeftClimber(double percent) {
+     return new StartEndCommand(
+       () -> climber_.setLeftPercent(percent),
+       () -> climber_.stopLeftMotor(),
+       climber_
+     );
+   }
+
+   public Command setRightClimber(double percent) {
+     return new StartEndCommand(
+       () -> climber_.setRightPercent(percent),
+       () -> climber_.stopRightMotor(),
+       climber_
+     );
+   }
+
 
   public Command setArmPID(double angle) {
     return new StartEndCommand(
@@ -170,8 +189,8 @@ public class Superstructure {
   }
 
   public enum Position {
-    STOW(50, "STOW"),
-    SUBWOOFER(16.5, "SUBWOOFER"),
+    STOW(55, "STOW"),
+    SUBWOOFER(16.2, "SUBWOOFER"),
     AMP(60, "AMP"),
     GROUND_INTAKE(2, "GROUND_INTAKE"),
     SOURCE_INTAKE(45, "SOURCE_INTAKE");

@@ -15,6 +15,7 @@ public class Feeder extends SubsystemBase{
     leader_.restoreFactoryDefaults();
     leader_.setInverted(false);
     leader_.setIdleMode(CANSparkMax.IdleMode.kCoast);
+    leader_.setSmartCurrentLimit(35);
   }
 
   @Override
