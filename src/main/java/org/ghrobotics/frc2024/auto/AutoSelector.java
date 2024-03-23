@@ -56,6 +56,8 @@ public class AutoSelector {
 
   PathPlannerPath left_one_intake_path = PathPlannerPath.fromPathFile("left_one_intake");
 
+  Command autonomous_command_;
+
   Trigger trigger_ = new Trigger(() -> true);
 
   public AutoSelector(Drive drive, RobotState robot_state, Superstructure superstructure, Arm arm, Intake intake, Shooter shooter, Feeder feeder) {
@@ -67,7 +69,7 @@ public class AutoSelector {
     shooter_ = shooter;
     feeder_ = feeder;
 
-    routine_chooser_ = new SendableChooser<Command>();
+    
     
 
     stop_all_motor = new ParallelCommandGroup(
@@ -99,8 +101,11 @@ public class AutoSelector {
       drive_
     );
 
+    routine_chooser_ = AutoBuilder.buildAutoChooser();
     routine_chooser_.setDefaultOption("Four Note Auto", fourNoteFull());
   }
+
+  public Command run()
 
   public Command getSelectedRoutine() {
     return routine_chooser_.getSelected();
@@ -336,6 +341,12 @@ public class AutoSelector {
 
   public PathPlannerPath getPath() {
     return left_one_intake_path;
+  }
+
+  public enum Routine {
+    FOUR_NOTE_AUTO,
+    THREE_NOTE_AUTO,
+    ONE_NOTE_TAXI_AUTO
   }
   
 
