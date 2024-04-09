@@ -21,8 +21,11 @@ import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 /**
@@ -53,9 +56,11 @@ public class Robot extends TimedRobot {
   // Controller
   private final CommandXboxController driver_controller_ = new CommandXboxController(0);
   private final CommandXboxController operator_controller_ = new CommandXboxController(1);
+  // private final CommandPS4Controller operator_controller_ = new CommandPS4Controller(1);
+
 
   // Superstructure
-  private final Superstructure superstructure_ = new Superstructure(arm_, intake_, shooter_, feeder_, climber_);
+  private final Superstructure superstructure_ = new Superstructure(arm_, intake_, shooter_, feeder_, robot_state_, climber_, drive_);
   private final AutoSelector auto_selector_= new AutoSelector(drive_, robot_state_, superstructure_, arm_, intake_, shooter_, feeder_);
 
   // Telemetry
@@ -72,6 +77,8 @@ public class Robot extends TimedRobot {
 
     // Just to test the blue subwoofer distance
     // robot_state_.reset(limelight_.getEstimatedVisionRobotPose());
+
+    // drive_.leftRightSteerEcoder();
   }
   
   @Override
@@ -84,12 +91,14 @@ public class Robot extends TimedRobot {
       robot_state_.update();
 
     SmartDashboard.putBoolean("Auto", isAuto);
-    SmartDashboard.putNumber("Vision x", limelight_.getBotPose2d().getX());
-    SmartDashboard.putNumber("Vision y", limelight_.getBotPose2d().getY());
-    SmartDashboard.putNumber("Vision Degrees", limelight_.getBotPose2d().getRotation().getDegrees());
+    // SmartDashboard.putNumber("Vision x", limelight_.getBotPose2d().getX());
+    // SmartDashboard.putNumber("Vision y", limelight_.getBotPose2d().getY());
+    // SmartDashboard.putNumber("Vision Degrees", limelight_.getBotPose2d().getRotation().getDegrees());
 
     SmartDashboard.putData(auto_selector_.getRoutineChooser());
     SmartDashboard.putData(auto_selector_.getPositionChooser());
+
+    SmartDashboard.putNumber("Vision X", LimelightHelpers.getTX("limelight"));
 
     // if(!Robot.isSimulation())
     //   field_.setRobotPose(robot_state_.getPosition());
@@ -150,7 +159,7 @@ public class Robot extends TimedRobot {
 
     // Driver Control
     //  * RT:  Spin Shooter
-    driver_controller_.rightTrigger().whileTrue(superstructure_.setShooterPercent(0.85));
+    driver_controller_.rightTrigger().whileTrue(superstructure_.setShooterPercent(0.95));
 
     driver_controller_.rightBumper().whileTrue(superstructure_.setShooterPercent(-0.6));
 
@@ -158,7 +167,10 @@ public class Robot extends TimedRobot {
 
     // driver_controller_.pov(270).whileTrue(superstructure_.setShooter(85));
 
-    driver_controller_.leftTrigger().whileTrue(superstructure_.setIntake(0.55));
+    driver_controller_.leftTrigger().whileTrue(new ParallelCommandGroup(
+      superstructure_.setIntake(0.55),
+      superstructure_.align())
+    );
 
     driver_controller_.leftBumper().whileTrue(superstructure_.setIntake(-0.25));
 
@@ -166,15 +178,15 @@ public class Robot extends TimedRobot {
 
     driver_controller_.a().whileTrue(superstructure_.setFeeder(0.85));
 
-    driver_controller_.b().whileTrue(superstructure_.setFeeder(-0.75));
+    driver_controller_.b().whileTrue(superstructure_.setFeeder(-0.35));
 
     driver_controller_.y().onTrue(new InstantCommand(() -> drive_.resetGyro()));
 
     // driver_controller_.pov(90).whileTrue(superstructure_.setShooter(90));
     
-    driver_controller_.pov(90).whileTrue(superstructure_.setArmPercent(0.15));
+    driver_controller_.pov(90).whileTrue(superstructure_.setPosition(Superstructure.Position.SUBWOOFER));
 
-    driver_controller_.pov(270).whileTrue(superstructure_.setArmPercent(-0.15));
+    driver_controller_.pov(270).whileTrue(superstructure_.setPosition(Superstructure.Position.GROUND_INTAKE));
 
     
     // Operator Control

@@ -21,13 +21,13 @@ public class Intake extends SubsystemBase {
     leader_left_ = new CANSparkMax(Constants.kLeaderLeftId, MotorType.kBrushless);
     leader_left_.restoreFactoryDefaults();
     leader_left_.setInverted(true);
-    leader_left_.setIdleMode(CANSparkMax.IdleMode.kBrake);
+    leader_left_.setIdleMode(CANSparkMax.IdleMode.kCoast);
 
 
     leader_right_ = new CANSparkMax(Constants.kLeaderRightId, MotorType.kBrushless);
     leader_right_.restoreFactoryDefaults();
     leader_right_.setInverted(true);
-    leader_right_.setIdleMode(CANSparkMax.IdleMode.kBrake);
+    leader_right_.setIdleMode(CANSparkMax.IdleMode.kCoast);
     leader_right_.follow(leader_left_);
 
     // Safety

@@ -116,6 +116,10 @@ public class SwerveModule {
     if (!Robot.isSimulation())
       steer_encoder_.setPosition(Math.toRadians(getCANCoderDeg()));
   }
+
+  public void resetSteerEncoder() {
+    steer_encoder_.setPosition(0);
+  }
   
   /**
   * Sets Steer angle for individual module

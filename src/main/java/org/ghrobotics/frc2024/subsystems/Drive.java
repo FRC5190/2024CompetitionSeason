@@ -63,15 +63,16 @@ public class Drive extends SubsystemBase {
     for (int i = 0; i < modules_.length; i++) {
       modules_[i].setDesiredState(module_states[i], output_type_);
       
-      // SmartDashboard.putNumber(String.format("Module [%d] Speed", i),
-      //   modules_[i].getDriveVelocity());
-      // SmartDashboard.putNumber(String.format("Module [%d] Angle", i),
-      //   modules_[i].getSteerPosition().getDegrees());
+      SmartDashboard.putNumber(String.format("Module [%d] Speed", i),
+        modules_[i].getDriveVelocity());
+      SmartDashboard.putNumber(String.format("Module [%d] Angle", i),
+        modules_[i].getSteerPosition().getDegrees());
     }
 
     if (io_.reset_gyro) {
       gyro_.zeroYaw();
       io_.reset_gyro = false;
+      
     }
   }
   
@@ -134,6 +135,10 @@ public class Drive extends SubsystemBase {
     back_left_.setAngle(-45);
     back_right_.setAngle(45);
   }
+
+  public void leftRightSteerEcoder() {
+    front_right_.resetSteerEncoder();
+  }
   
   // Output Type
   public enum OutputType {
@@ -174,7 +179,7 @@ public class Drive extends SubsystemBase {
       kFrontRightConfig.drive_id = 3;
       kFrontRightConfig.steer_id = 4;
       kFrontRightConfig.cancoder_id = 12;
-      kFrontRightConfig.module_offset_deg = 173.44;
+      kFrontRightConfig.module_offset_deg = -176.0;
       kFrontRightConfig.invert = true;
       
       kBackLeftConfig.drive_id = 5;

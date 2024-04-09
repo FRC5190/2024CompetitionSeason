@@ -149,7 +149,7 @@ public class AutoSelector {
       fourNotePt3().withTimeout(6.0),
       new ArmPID(arm_, 32.85),
       new WaitCommand(0.2),
-      new InstantCommand(() -> feeder_.setPercent(0.75)),
+      new InstantCommand(() -> feeder_.setPercent(0.35)),
       new InstantCommand(() -> intake_.setPercent(0.5)),
       new WaitCommand(1.0),
       new ArmPID(arm_, 2),
@@ -169,7 +169,7 @@ public class AutoSelector {
         new ArmPID(arm_, 24.9),
         new WaitCommand(0.5),
         new InstantCommand(() -> intake_.setPercent(0.55)),
-        new InstantCommand(() -> feeder_.setPercent(0.5)),
+        new InstantCommand(() -> feeder_.setPercent(0.3)),
         new WaitCommand(0.2),
         new ArmPID(arm_, 2),
         new InstantCommand(() -> intake_.setPercent(0.55)),
@@ -187,7 +187,7 @@ public class AutoSelector {
         new ArmPID(arm_, 26.2),
         new WaitCommand(0.6),
         new InstantCommand(() -> intake_.setPercent(0.55)),
-        new InstantCommand(() -> feeder_.setPercent(0.5)),
+        new InstantCommand(() -> feeder_.setPercent(0.3)),
         new WaitCommand(0.5),
         new ArmPID(arm_, 2),
         new InstantCommand(() -> intake_.setPercent(0.55)),
@@ -202,7 +202,7 @@ public class AutoSelector {
       new SequentialCommandGroup(
         new ArmPID(arm_, 26.4),
         new WaitCommand(0.5),
-        new InstantCommand(() -> feeder_.setPercent(0.5)),
+        new InstantCommand(() -> feeder_.setPercent(0.3)),
         new InstantCommand(() -> intake_.setPercent(0.55)),
         new WaitCommand(0.5),
         new ArmPID(arm_, 2).withTimeout(1.5),
@@ -223,7 +223,7 @@ public class AutoSelector {
           new ArmPID(arm_, 28),
           new WaitCommand(0.5),
           new InstantCommand(() -> intake_.setPercent(0.55)),
-          new InstantCommand(() -> feeder_.setPercent(0.5)),
+          new InstantCommand(() -> feeder_.setPercent(0.3)),
           new WaitCommand(0.2),
           new ArmPID(arm_, 2),
           new InstantCommand(() -> intake_.setPercent(0.55)),
@@ -238,7 +238,7 @@ public class AutoSelector {
           new ArmPID(arm_, 28.5),
           // new WaitCommand(0.5),
           new InstantCommand(() -> intake_.setPercent(-0.35)),
-          new InstantCommand(() -> feeder_.setPercent(0.5)),
+          new InstantCommand(() -> feeder_.setPercent(0.3)),
           new WaitCommand(0.5),
           new ArmPID(arm_, 2),
           new InstantCommand(() -> intake_.setPercent(-0.35)),
@@ -277,7 +277,7 @@ public class AutoSelector {
         new SequentialCommandGroup(
           new ArmPID(arm_, 30),
           new InstantCommand(() -> intake_.setPercent(0.5)),
-          new InstantCommand(() -> feeder_.setPercent(0.5)),
+          new InstantCommand(() -> feeder_.setPercent(0.3)),
           new WaitCommand(0.15),
           new ArmPID(arm_, 2),
           new InstantCommand(() -> intake_.setPercent(0.5)),
@@ -296,7 +296,7 @@ public class AutoSelector {
       new ArmPID(arm_, 16.5),
       new WaitCommand(0.4),
       new InstantCommand(() -> intake_.setPercent(0.5)),
-      new InstantCommand(() -> feeder_.setPercent(0.5)),
+      new InstantCommand(() -> feeder_.setPercent(0.3)),
       new WaitCommand(1.0),
       new ArmPID(arm_, 2),
       AutoBuilder.followPath(go_straight_path),
@@ -315,13 +315,13 @@ public class AutoSelector {
       new WaitCommand(0.2),
       new ParallelCommandGroup(
         new InstantCommand(() -> intake_.setPercent(0.5)),
-        new InstantCommand(() -> feeder_.setPercent(0.5))
+        new InstantCommand(() -> feeder_.setPercent(0.3))
       ),
       new WaitCommand(1.0),
       new ParallelCommandGroup(
-        new InstantCommand(() -> intake_.stopMotor()),
-        new InstantCommand(() -> feeder_.stopMotor()),
-        new InstantCommand(() -> shooter_.stopMotor())
+        // new InstantCommand(() -> intake_.stopMotor()),
+        new InstantCommand(() -> feeder_.stopMotor())
+        // new InstantCommand(() -> shooter_.stopMotor())
       ),
       new ParallelCommandGroup(
         new ArmPID(arm_, 2),
@@ -330,9 +330,9 @@ public class AutoSelector {
       ),
       new WaitCommand(0.5),
       new ParallelCommandGroup(
-        new InstantCommand(() -> intake_.stopMotor()),
-        new InstantCommand(() -> feeder_.stopMotor()),
-        new InstantCommand(() -> shooter_.stopMotor())
+        // new InstantCommand(() -> intake_.stopMotor()),
+        new InstantCommand(() -> feeder_.stopMotor())
+        // new InstantCommand(() -> shooter_.stopMotor())
       ),
       new ParallelCommandGroup(
         new ArmPID(arm_, 26.75),
@@ -341,25 +341,25 @@ public class AutoSelector {
       new WaitCommand(0.8), // This one might be needed originally set to 1
       new ParallelCommandGroup(
         new InstantCommand(() -> intake_.setPercent(0.5)),
-        new InstantCommand(() -> feeder_.setPercent(0.5))
+        new InstantCommand(() -> feeder_.setPercent(0.3))
       ),
       new WaitCommand(0.8),
       new ParallelCommandGroup(
         new ArmPID(arm_, 2),
-        new InstantCommand(() -> intake_.stopMotor()),
-        new InstantCommand(() -> feeder_.stopMotor()),
-        new InstantCommand(() -> shooter_.stopMotor())
+        // new InstantCommand(() -> intake_.stopMotor()),
+        new InstantCommand(() -> feeder_.stopMotor())
+        // new InstantCommand(() -> shooter_.stopMotor())
       ),
       new WaitCommand(0.1),
       new ParallelCommandGroup(
-        new InstantCommand(() -> intake_.setPercent(0.35)),
+        new InstantCommand(() -> intake_.setPercent(0.55)),
         AutoBuilder.followPath(middle_left_intake_path)
       ),
       new WaitCommand(0.3),
       new ParallelCommandGroup(
-        new InstantCommand(() -> intake_.stopMotor()),
-        new InstantCommand(() -> feeder_.stopMotor()),
-        new InstantCommand(() -> shooter_.stopMotor())
+        // new InstantCommand(() -> intake_.stopMotor()),
+        new InstantCommand(() -> feeder_.stopMotor())
+        // new InstantCommand(() -> shooter_.stopMotor())
       ),
       new ParallelCommandGroup(
         new InstantCommand(() -> shooter_.setPercent(0.75)),
@@ -369,7 +369,7 @@ public class AutoSelector {
       new WaitCommand(0.8),
       new ParallelCommandGroup(
         new InstantCommand(() -> intake_.setPercent(0.5)),
-        new InstantCommand(() -> feeder_.setPercent(0.5))
+        new InstantCommand(() -> feeder_.setPercent(0.3))
       ),
       // End of Auto (moves arm down and turns off all motors)
       new WaitCommand(0.8),
