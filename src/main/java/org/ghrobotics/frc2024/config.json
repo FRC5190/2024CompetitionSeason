@@ -1,0 +1,45 @@
+{
+  "name": "model",
+  "rotations": [
+    {
+      "axis": "x",
+      "degrees": 90
+    },
+    {
+      "axis": "y",
+      "degrees": 0
+    },
+    {
+      "axis": "z",
+      "degrees": -90
+    }
+  ],
+  "position": [
+    -0.2,
+    0.56,
+    0.05
+  ],
+  "components": [
+    {
+      "zeroedRotations": [
+        {
+          "axis": "x",
+          "degrees": 90
+        },
+        {
+          "axis": "y",
+          "degrees": 0
+        },
+        {
+          "axis": "z",
+          "degrees": 180
+        }   
+      ],
+      "zeroedPosition": [
+        -0.075,
+         0.17,
+        -0.045
+      ]
+    }
+  ]
+}

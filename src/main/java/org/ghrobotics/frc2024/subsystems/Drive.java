@@ -24,6 +24,9 @@ public class Drive extends SubsystemBase {
   // navX Gyro
   private final AHRS gyro_;
 
+  // SwerveModuleState
+  SwerveModuleState[] module_states;
+
   
   // Kinematics
   SwerveDriveKinematics kinematics_ = new SwerveDriveKinematics(
@@ -56,7 +59,7 @@ public class Drive extends SubsystemBase {
     io_.angle = -Math.toRadians(gyro_.getYaw());
     
     // Calculate outputs
-    SwerveModuleState[] module_states = kinematics_.toSwerveModuleStates(io_.speeds);
+     module_states = kinematics_.toSwerveModuleStates(io_.speeds);
     SwerveDriveKinematics.desaturateWheelSpeeds(module_states, Constants.kMaxSpeed);
     
     // Set outputs and telemetry
@@ -101,6 +104,11 @@ public class Drive extends SubsystemBase {
     return kinematics_;
   }
 
+  // Get SwerveModuleStates
+  public SwerveModuleState[] getSwerveModuleStates() {
+    return module_states;
+  }
+
   // Get Speeds
   public ChassisSpeeds getSpeeds() {
     return io_.speeds;
@@ -138,6 +146,33 @@ public class Drive extends SubsystemBase {
 
   public void leftRightSteerEcoder() {
     front_right_.resetSteerEncoder();
+  }
+
+  // Orbit 1690's skidding detection method, don't know if it works
+  public static double getSkiddingRatio(SwerveModuleState[] swerveStatesMeasured, SwerveDriveKinematics swerveDriveKinematics) {
+    final double angularVelocityOmegaMeasured = swerveDriveKinematics.toChassisSpeeds(swerveStatesMeasured).omegaRadiansPerSecond;
+    final SwerveModuleState[] swerveStatesRotationalPart = swerveDriveKinematics.toSwerveModuleStates(new ChassisSpeeds(0,0,angularVelocityOmegaMeasured));
+    final double[] swerveStatesTranslationalPartMagnitudes = new double[swerveStatesMeasured.length];
+
+    for (int i = 0; i < swerveStatesMeasured.length; i++ ) {
+      final Translation2d swerveStateMeasuredAsVector = convertSwerveStateToVelocityVector(swerveStatesMeasured[i]), 
+        swerveStatesRotationalPartAsVector = convertSwerveStateToVelocityVector(swerveStatesRotationalPart[i]),
+        swerveStatesTranslationalPartAsVector = swerveStateMeasuredAsVector.minus(swerveStatesRotationalPartAsVector);
+      swerveStatesTranslationalPartMagnitudes[i] = swerveStatesTranslationalPartAsVector.getNorm();
+
+    }
+
+    double maximumTranslationSpeed = 0, minimumTranslationalSpeed = Double.POSITIVE_INFINITY;
+    for (double translationalSpeed:swerveStatesTranslationalPartMagnitudes) {
+      maximumTranslationSpeed = Math.max(maximumTranslationSpeed, translationalSpeed);
+      minimumTranslationalSpeed = Math.min(minimumTranslationalSpeed, translationalSpeed);
+    }
+
+    return maximumTranslationSpeed / minimumTranslationalSpeed;
+  }
+
+  private static Translation2d convertSwerveStateToVelocityVector(SwerveModuleState swerveModuleState) {
+    return new Translation2d(swerveModuleState.speedMetersPerSecond, swerveModuleState.angle);
   }
   
   // Output Type
