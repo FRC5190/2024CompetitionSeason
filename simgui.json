@@ -1,28 +1,60 @@
 {
+  "HALProvider": {
+    "Other Devices": {
+      "navX-Sensor[0]": {
+        "header": {
+          "open": true
+        }
+      }
+    }
+  },
   "NTProvider": {
     "types": {
-      "/FMSInfo": "FMSInfo"
+      "/FMSInfo": "FMSInfo",
+      "/Shuffleboard/2024/Field": "Field2d",
+      "/Shuffleboard/2024/SendableChooser[0]": "String Chooser",
+      "/Shuffleboard/2024/SendableChooser[1]": "String Chooser",
+      "/Shuffleboard/2024/Superstructure": "Mechanism2d",
+      "/SmartDashboard/Field": "Field2d",
+      "/SmartDashboard/SendableChooser[0]": "String Chooser",
+      "/SmartDashboard/SendableChooser[1]": "String Chooser",
+      "/SmartDashboard/field": "Field2d"
     }
   },
   "NetworkTables": {
-    "Retained Values": {
-      "open": false
-    },
     "transitory": {
-      "Shuffleboard": {
-        ".metadata": {
+      "AdvantageKit": {
+        "RealOutputs": {
+          "PathFollowing": {
+            "open": true
+          },
           "open": true
         },
-        ".recording": {
-          "open": true
-        }
-      },
-      "SmartDashboard": {
         "open": true
+      },
+      "Shuffleboard": {
+        ".metadata": {
+          "open": false
+        },
+        ".recording": {
+          "open": false
+        }
       }
     }
   },
   "NetworkTables Info": {
+    "AdvantageScope@1": {
+      "Publishers": {
+        "open": false
+      },
+      "Subscribers": {
+        "open": false
+      },
+      "open": false
+    },
+    "DartClient_13310512@1": {
+      "open": false
+    },
     "visible": true
   }
 }

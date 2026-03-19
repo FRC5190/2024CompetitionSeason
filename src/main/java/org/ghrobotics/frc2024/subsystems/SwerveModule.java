@@ -1,13 +1,19 @@
 package org.ghrobotics.frc2024.subsystems;
 
 import org.ghrobotics.frc2024.CANCoderSwerve;
+import org.ghrobotics.frc2024.Robot;
+
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkBase.IdleMode;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class SwerveModule {
   // Swerve Module Configuration
@@ -36,11 +42,13 @@ public class SwerveModule {
     drive_motor_.restoreFactoryDefaults();
     drive_motor_.setIdleMode(CANSparkMax.IdleMode.kCoast);
     drive_motor_.setInverted(configuration_.invert);
+    drive_motor_.setSmartCurrentLimit(35);
     
     steer_motor_ = new CANSparkMax(configuration_.steer_id, CANSparkMax.MotorType.kBrushless);
     steer_motor_.restoreFactoryDefaults();
     steer_motor_.setIdleMode(CANSparkMax.IdleMode.kCoast);
     steer_motor_.setInverted(true);
+    steer_motor_.setSmartCurrentLimit(35);
     
     // Initialize encoders
     drive_encoder_ = drive_motor_.getEncoder();
@@ -108,7 +116,12 @@ public class SwerveModule {
   // Reset Encoders
   public void resetEncoders() {
     drive_encoder_.setPosition(0);
-    steer_encoder_.setPosition(Math.toRadians(getCANCoderDeg()));
+    if (!Robot.isSimulation())
+      steer_encoder_.setPosition(Math.toRadians(getCANCoderDeg()));
+  }
+
+  public void resetSteerEncoder() {
+    steer_encoder_.setPosition(0);
   }
   
   /**
@@ -138,7 +151,14 @@ public class SwerveModule {
     // Set drive output
     switch (output_type) {
       case OPEN_LOOP:
-        drive_motor_.set(state.speedMetersPerSecond / Constants.kMaxModuleSpeed);
+        // SmartDashboard.putNumber("11Drive Motor Set Speed", state.speedMetersPerSecond / Constants.kMaxModuleSpeed);
+        // SmartDashboard.putNumber("11max speed", state.speedMetersPerSecond);
+        if(SmartDashboard.getBoolean("Auto", false)) {
+          drive_motor_.set(state.speedMetersPerSecond / Constants.kMaxAutoSpeed);
+        } else {
+          drive_motor_.set(state.speedMetersPerSecond / Constants.kMaxModuleSpeed);
+        }
+        
         break;
       case VELOCITY:
         double drive_correction = drive_pid_controller_.calculate(
@@ -168,6 +188,8 @@ public class SwerveModule {
     public static final double kDriveGearRatio = 8.14;
     public static final double kSteerGearRatio = 150.0 / 7;
     public static final double kWheelRadius = 0.0508;
-    public static final double kMaxModuleSpeed = 3.66;
+    // Setting it any lower can increase sensitivity but not increase speed
+    public static final double kMaxModuleSpeed = 1.0;
+    public static final double kMaxAutoSpeed = 3.66;
   }
 }

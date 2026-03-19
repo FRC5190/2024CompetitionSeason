@@ -4,6 +4,7 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Intake extends SubsystemBase {
@@ -20,15 +21,18 @@ public class Intake extends SubsystemBase {
     leader_left_ = new CANSparkMax(Constants.kLeaderLeftId, MotorType.kBrushless);
     leader_left_.restoreFactoryDefaults();
     leader_left_.setInverted(true);
-    leader_left_.setIdleMode(CANSparkMax.IdleMode.kBrake);
+    leader_left_.setIdleMode(CANSparkMax.IdleMode.kCoast);
 
 
     leader_right_ = new CANSparkMax(Constants.kLeaderRightId, MotorType.kBrushless);
     leader_right_.restoreFactoryDefaults();
     leader_right_.setInverted(true);
-    leader_right_.setIdleMode(CANSparkMax.IdleMode.kBrake);
+    leader_right_.setIdleMode(CANSparkMax.IdleMode.kCoast);
     leader_right_.follow(leader_left_);
 
+    // Safety
+    leader_left_.setSmartCurrentLimit(30);
+    leader_right_.setSmartCurrentLimit(30);
     
   }
   
@@ -36,8 +40,15 @@ public class Intake extends SubsystemBase {
     // Read inputs.
     io_.current_left_ = leader_left_.getOutputCurrent();
     io_.current_right_ = leader_right_.getOutputCurrent();
-    leader_left_.set(io_.left_demand);
-    leader_right_.set(io_.right_demand);
+    SmartDashboard.putNumber("Left Intake current", io_.current_left_);
+    SmartDashboard.putNumber("Right Intake current", io_.current_right_);
+    if(io_.left_demand == 0) {
+      leader_left_.set(io_.left_demand);
+    } else {
+      leader_left_.set(io_.left_demand - 0.3);
+    }
+    
+    leader_right_.set(-io_.right_demand);
   }
 
   // public double getPercent() {
@@ -51,12 +62,20 @@ public class Intake extends SubsystemBase {
   // }
 
   public void setPercent(double value) {
-    io_.left_demand = value;
-    io_.right_demand = value - 0.1;
+    io_.left_demand = value + 0.2;
+    io_.right_demand = value;
   }
   public void stopMotor() {
     io_.left_demand = 0;
     io_.right_demand = 0;
+  }
+
+  public double getLeftOutputCurrent() {
+    return io_.current_left_;
+  }
+
+  public double getRightOutputCurrent() {
+    return io_.current_right_;
   }
 
   // IO
